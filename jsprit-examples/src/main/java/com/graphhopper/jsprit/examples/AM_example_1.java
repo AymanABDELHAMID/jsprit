@@ -86,7 +86,7 @@ public class AM_example_1 {
          */
 
         VehicleRoutingProblem problem = vrpBuilder.setFleetSize(VehicleRoutingProblem.FleetSize.FINITE).build();
-
+        // vrpBuilder.setFleetSize(VehicleRoutingProblem.FleetSize.FINITE);
         /*
          * get the algorithm out-of-the-box.
          */

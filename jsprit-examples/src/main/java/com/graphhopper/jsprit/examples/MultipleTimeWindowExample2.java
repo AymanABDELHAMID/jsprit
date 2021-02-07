@@ -94,6 +94,8 @@ public class MultipleTimeWindowExample2 {
             vrpBuilder.addJob(service);
         }
 
+        // add charging station here
+
         for(int i=0;i<12;i++){
             Service service = Service.Builder.newInstance(""+(i+51))
 //                .addTimeWindow(0, 80)

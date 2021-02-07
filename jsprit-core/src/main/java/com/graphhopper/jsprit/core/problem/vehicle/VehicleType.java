@@ -18,6 +18,7 @@
 package com.graphhopper.jsprit.core.problem.vehicle;
 
 import com.graphhopper.jsprit.core.problem.Capacity;
+import com.graphhopper.jsprit.core.problem.BatteryAM;
 
 /**
  * Basic interface for vehicle-type-data.
@@ -39,6 +40,14 @@ public interface VehicleType {
      * @return {@link com.graphhopper.jsprit.core.problem.Capacity}
      */
     Capacity getCapacityDimensions();
+
+    /**
+     * Returns vehicle Range.
+     *
+     * @return {@link com.graphhopper.jsprit.core.problem.BatteryAM}
+     */
+    BatteryAM getRange();
+
 
     /**
      * Returns maximum velocity of this vehicle-type.

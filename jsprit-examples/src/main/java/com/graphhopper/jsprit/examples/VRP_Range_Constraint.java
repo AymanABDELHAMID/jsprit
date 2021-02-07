@@ -1,23 +1,8 @@
 /*
- * Licensed to GraphHopper GmbH under one or more contributor
- * license agreements. See the NOTICE file distributed with this work for
- * additional information regarding copyright ownership.
- *
- * GraphHopper GmbH licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Ayman Mahmoud - Example 1 - Simple VRP
  */
 
 package com.graphhopper.jsprit.examples;
-
 
 import com.graphhopper.jsprit.analysis.toolbox.Plotter;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
@@ -32,20 +17,40 @@ import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.ActivityVisitor;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.DeliverShipment;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.PickupShipment;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Coordinate;
 import com.graphhopper.jsprit.core.util.EuclideanDistanceCalculator;
 import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 import com.graphhopper.jsprit.io.problem.VrpXMLReader;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
+// import the library that modifies vehicle type (BEV)
 
-//import jsprit.core.problem.solution.route.state.StateFactory; //v1.3.1
+/*
+ * The following import is inspired from the one presented by the following article:
+ * https://reader.elsevier.com/reader/sd/pii/S2352146521001022?token=6D4E21F130E2AD9715700E4D04C2C2BE6049A12DC1E8901D92E62CC88B1C94586CDEC7D523FE8E4039BE1B2F89EDFA65
+ */
 
-public class AdditionalDistanceConstraintExample {
+/**
+ * @author Ayman
+ *
+ *         !! No recharging or refueling is integrated !!
+ *         Vehicles are considered totally full at the beginning.
+ *
+ *         Creates the distance constraint.
+ */
 
+public class VRP_Range_Constraint  {
+
+// TODO:  the goal is to add the distance constraint here (then understand how)
+// TODO: create an example with vehicle attribute call it battery
+// TODO: try to print remaining battery percentage in the solution analyzer
     static class DistanceUpdater implements StateUpdater, ActivityVisitor {
 
         private final StateManager stateManager;
@@ -61,8 +66,7 @@ public class AdditionalDistanceConstraintExample {
 
         private TourActivity prevAct;
 
-        //        public DistanceUpdater(StateFactory.StateId distanceStateId, StateManager stateManager, VehicleRoutingTransportCostsMatrix costMatrix) { //v1.3.1
-        public DistanceUpdater(StateId distanceStateId, StateManager stateManager, VehicleRoutingTransportCostsMatrix transportCosts) { //head of development - upcoming release (v1.4)
+        public DistanceUpdater(StateId distanceStateId, StateManager stateManager, VehicleRoutingTransportCostsMatrix transportCosts) {
             this.costMatrix = transportCosts;
             this.stateManager = stateManager;
             this.distanceStateId = distanceStateId;
@@ -84,7 +88,7 @@ public class AdditionalDistanceConstraintExample {
         @Override
         public void finish() {
             distance += getDistance(prevAct, vehicleRoute.getEnd());
-//            stateManager.putTypedRouteState(vehicleRoute,distanceStateId,Double.class,distance); //v1.3.1
+    //            stateManager.putTypedRouteState(vehicleRoute,distanceStateId,Double.class,distance); //v1.3.1
             stateManager.putRouteState(vehicleRoute, distanceStateId, distance); //head of development - upcoming release (v1.4)
         }
 
@@ -93,7 +97,8 @@ public class AdditionalDistanceConstraintExample {
         }
     }
 
-    static class DistanceConstraint implements HardActivityConstraint {
+// Reminder: There is a maximum distance constraint that we can use.
+    static class RangeConstraint implements HardActivityConstraint {
 
         private final StateManager stateManager;
 
@@ -101,11 +106,9 @@ public class AdditionalDistanceConstraintExample {
 
         private final double maxDistance;
 
-        //        private final StateFactory.StateId distanceStateId; //v1.3.1
-        private final StateId distanceStateId; //head of development - upcoming release (v1.4)
+        private final StateId distanceStateId;
 
-        //        DistanceConstraint(double maxDistance, StateFactory.StateId distanceStateId, StateManager stateManager, VehicleRoutingTransportCostsMatrix costsMatrix) { //v1.3.1
-        DistanceConstraint(double maxDistance, StateId distanceStateId, StateManager stateManager, VehicleRoutingTransportCostsMatrix transportCosts) { //head of development - upcoming release (v1.4)
+        RangeConstraint(double maxDistance, StateId distanceStateId, StateManager stateManager, VehicleRoutingTransportCostsMatrix transportCosts) { //get maximum distance from range of vehicle
             this.costsMatrix = transportCosts;
             this.maxDistance = maxDistance;
             this.stateManager = stateManager;
@@ -129,11 +132,21 @@ public class AdditionalDistanceConstraintExample {
 
     }
 
+    /**
+     *
+     * @param from
+     * @param to
+     * @param costsMatrix
+     * @return Distance from point one to point 2
+     */
+    double getDistance(TourActivity from, TourActivity to, VehicleRoutingTransportCostsMatrix costsMatrix) {
+        return costsMatrix.getDistance(from.getLocation().getId(), to.getLocation().getId());
+    }
     public static void main(String[] args) {
 
         //route length 618
         VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
-        new VrpXMLReader(vrpBuilder).read("../../../input/pickups_and_deliveries_solomon_r101_withoutTWs.xml");
+        new VrpXMLReader(vrpBuilder).read("input/pickups_and_deliveries_solomon_r101_withoutTWs.xml");
         //builds a matrix based on euclidean distances; t_ij = euclidean(i,j) / 2; d_ij = euclidean(i,j);
         VehicleRoutingTransportCostsMatrix costMatrix = createMatrix(vrpBuilder);
         vrpBuilder.setRoutingCost(costMatrix);
@@ -143,10 +156,10 @@ public class AdditionalDistanceConstraintExample {
         StateManager stateManager = new StateManager(vrp); //head of development - upcoming release (v1.4)
 
         StateId distanceStateId = stateManager.createStateId("distance"); //head of development - upcoming release (v1.4)
-        stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, costMatrix));
+        stateManager.addStateUpdater(new AdditionalDistanceConstraintExample.DistanceUpdater(distanceStateId, stateManager, costMatrix));
 
         ConstraintManager constraintManager = new ConstraintManager(vrp, stateManager);
-        constraintManager.addConstraint(new DistanceConstraint(120., distanceStateId, stateManager, costMatrix), ConstraintManager.Priority.CRITICAL);
+        constraintManager.addConstraint(new AdditionalDistanceConstraintExample.DistanceConstraint(120., distanceStateId, stateManager, costMatrix), ConstraintManager.Priority.CRITICAL);
 
         VehicleRoutingAlgorithm vra = Jsprit.Builder.newInstance(vrp).setStateAndConstraintManager(stateManager,constraintManager)
             .buildAlgorithm();
@@ -176,3 +189,4 @@ public class AdditionalDistanceConstraintExample {
 
 
 }
+

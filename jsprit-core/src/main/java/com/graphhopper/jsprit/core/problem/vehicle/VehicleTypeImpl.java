@@ -19,6 +19,7 @@ package com.graphhopper.jsprit.core.problem.vehicle;
 
 
 import com.graphhopper.jsprit.core.problem.Capacity;
+import com.graphhopper.jsprit.core.problem.BatteryAM;
 
 /**
  * Implementation of {@link VehicleType}.
@@ -139,6 +140,15 @@ public class VehicleTypeImpl implements VehicleType {
         private Capacity.Builder capacityBuilder = Capacity.Builder.newInstance();
 
         private Capacity capacityDimensions = null;
+
+
+        /**
+         * Ayman Mahmoud 06/02/2021
+         * Integrating Battery into vehicle type
+         */
+        private BatteryAM.Builder batteryBuilder = BatteryAM.Builder.newInstance();
+
+        private BatteryAM BatteryDimensions = null;
 
         private boolean dimensionAdded = false;
 
@@ -272,6 +282,12 @@ public class VehicleTypeImpl implements VehicleType {
          * @return VehicleTypeImpl
          */
         public VehicleTypeImpl build() {
+            if (capacityDimensions == null) {
+                capacityDimensions = capacityBuilder.build();
+            }
+            /**
+             * Ayman adding battery
+             */
             if (capacityDimensions == null) {
                 capacityDimensions = capacityBuilder.build();
             }

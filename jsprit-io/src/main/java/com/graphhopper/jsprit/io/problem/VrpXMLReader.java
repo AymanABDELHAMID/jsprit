@@ -135,6 +135,8 @@ public class VrpXMLReader {
         read(xmlConfig);
     }
 
+
+
     private XMLConfiguration createXMLConfiguration() {
         XMLConfiguration xmlConfig = new XMLConfiguration();
         xmlConfig.setAttributeSplittingDisabled(true);
@@ -739,6 +741,23 @@ public class VrpXMLReader {
         }
 
     }
+
+    /**
+     * @author: Ayman 09/02
+     * @return range The battery range
+     * This will only work in a homogenous fleet
+     * TODO: This is a quick fix, it should be changed when the battery range is modified throughout the course
+     */
+        // A static variable acts as a global variable and is shared among all the objects of the class.
+    // Non-static variables are specific to instance object in which they are created.
+    /*
+    public static double getBatteryRange(String vehicleID){
+        //return getVehicle(vehicleID).getType().getBatteryDimensions().getRange(0);
+        final double range = vehicleMap.get(vehicleID).getType().getBatteryDimensions().getRange(0); //getBatteryRange(vehicleID);
+        return range;
+    }
+
+     */
 
 
 }

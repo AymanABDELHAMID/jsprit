@@ -34,6 +34,7 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 
 import java.util.Collection;
 import java.io.File;
+import java.util.stream.Collectors;
 // import the library that modifies vehicle type (BEV)
 
 /*
@@ -166,8 +167,13 @@ public class VRP_Range_Constraint  {
         /**
          * Adding maximum distance from maximum battery range
          */
-        //vrp.getBatteryDimensions();
-        final double MAX_Range = 500.;
+        //Collection<VehicleType> h = vrpBuilder.getAddedVehicleTypes();
+
+        //final double MAX_Range = 500.;
+
+        //vehicleMap.get(vehicleID).getType().getBatteryDimensions().getRange(0); //getBatteryRange(vehicleID);
+        final double MAX_Range = vrpBuilder.getAddedVehicles().stream().collect(Collectors.toList()).get(0).getType().getBatteryDimensions().getRange(0);
+
         constraintManager.addConstraint(new RangeConstraint(MAX_Range, distanceStateId, stateManager, costMatrix), ConstraintManager.Priority.CRITICAL);
 
         VehicleRoutingAlgorithm vra = Jsprit.Builder.newInstance(vrp).setStateAndConstraintManager(stateManager,constraintManager)

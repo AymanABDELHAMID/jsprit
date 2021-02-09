@@ -17,25 +17,18 @@ import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.ActivityVisitor;
-import com.graphhopper.jsprit.core.problem.solution.route.activity.DeliverShipment;
-import com.graphhopper.jsprit.core.problem.solution.route.activity.PickupShipment;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
-import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Coordinate;
 import com.graphhopper.jsprit.core.util.EuclideanDistanceCalculator;
 import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 import com.graphhopper.jsprit.io.problem.VrpXMLReader;
-import org.apache.logging.log4j.Logger;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl.Builder;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 
-import java.util.Collection;
+
 import java.io.File;
+import java.util.Collection;
 import java.util.stream.Collectors;
-// import the library that modifies vehicle type (BEV)
 
 /*
  * The following import is inspired from the one presented by the following article:
@@ -149,6 +142,17 @@ public class VRP_Range_Constraint  {
     }
     public static void main(String[] args) {
 
+        /*
+         * some preparation - create output folder
+         */
+        File dir = new File("output");
+        // if the directory does not exist, create it
+        if (!dir.exists()) {
+            System.out.println("creating directory ./output");
+            boolean result = dir.mkdir();
+            if (result) System.out.println("./output created");
+        }
+
         VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
         new VrpXMLReader(vrpBuilder).read("C:\\Users\\AYMAN\\OneDrive - CentraleSupelec\\CentraleSupelec\\M2_MACLO\\Recherche\\Mémoire Thématique\\co"+
             "de\\jsprit\\jsprit-examples\\input\\pickups_and_deliveries_withBEV_withoutTWs_AM.xml");
@@ -184,7 +188,10 @@ public class VRP_Range_Constraint  {
 
         SolutionPrinter.print(vrp, Solutions.bestOf(solutions), SolutionPrinter.Print.VERBOSE);
 
-        new Plotter(vrp, Solutions.bestOf(solutions)).plot("output/plot", "plot");
+        /*
+         * plot
+         */
+        new Plotter(vrp, Solutions.bestOf(solutions)).plot("output/plot_vrp_range_AM", "plot");
     }
 
     private static VehicleRoutingTransportCostsMatrix createMatrix(VehicleRoutingProblem.Builder vrpBuilder) {

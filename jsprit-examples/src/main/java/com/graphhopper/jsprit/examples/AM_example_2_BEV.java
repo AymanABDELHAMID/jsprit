@@ -114,7 +114,7 @@ public class AM_example_2_BEV {
         /*
          * plot
          */
-        new Plotter(problem,bestSolution).plot("output/plot.png","simple example");
+        new Plotter(problem,bestSolution).plot("output/plot_simple_BEV_AM.png","simple example");
 
         /*
         render problem and solution with GraphStream

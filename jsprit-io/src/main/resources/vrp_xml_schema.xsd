@@ -98,6 +98,24 @@
                                                 </xs:sequence>
                                             </xs:complexType>
                                         </xs:element>
+                                        <xs:element name="battery" type="xs:integer" minOccurs="0" maxOccurs="1"
+                                                    default="0"/>
+                                        <xs:element name="battery-dimensions" minOccurs="0" maxOccurs="1">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="dimension" minOccurs="1" maxOccurs="unbounded">
+                                                        <xs:complexType>
+                                                            <xs:simpleContent>
+                                                                <xs:extension base="xs:double">
+                                                                    <xs:attribute name="index" type="xs:integer"
+                                                                                  use="optional"/>
+                                                                </xs:extension>
+                                                            </xs:simpleContent>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
                                         <xs:element name="costs">
                                             <xs:complexType>
                                                 <xs:all>

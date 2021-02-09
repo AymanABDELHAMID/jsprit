@@ -26,7 +26,7 @@
     </problemType>
     <vehicles>
         <vehicle>
-            <id>solomonVehicle</id>
+            <id>BEV</id>
             <typeId>BEV</typeId>
             <location>
                 <id>0</id>

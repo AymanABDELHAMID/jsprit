@@ -288,8 +288,8 @@ public class VehicleTypeImpl implements VehicleType {
             /**
              * Ayman adding battery
              */
-            if (capacityDimensions == null) {
-                capacityDimensions = capacityBuilder.build();
+            if (BatteryDimensions == null) {
+                BatteryDimensions = batteryBuilder.build();
             }
             return new VehicleTypeImpl(this);
         }
@@ -334,6 +334,52 @@ public class VehicleTypeImpl implements VehicleType {
             return this;
         }
 
+        /**
+         * Ayman 08/02
+         * add and set battery dimensions
+         */
+
+        /**
+         * Adds a Battery dimension.
+         *
+         * @param dimIndex dimension index
+         * @param dimVal dimension value
+         * @return the builder
+         * @throws IllegalArgumentException if dimVal < 0
+         * @throws IllegalArgumentException    if battery dimension is already set
+         */
+        public Builder addBatteryDimension(int dimIndex, int dimVal) {
+            if (dimVal < 0) throw new IllegalArgumentException("The battery value must not be negative.");
+            if (BatteryDimensions != null)
+                throw new IllegalArgumentException("Either build your dimension with build your dimensions with " +
+                    "addBatteryDimension(int dimIndex, int dimVal) or set the already built dimensions with .setBatteryDimensions(BatteryAM battery)." +
+                    "You used both methods.");
+            dimensionAdded = true;
+            batteryBuilder.addDimension(dimIndex, dimVal);
+            return this;
+        }
+
+        /**
+         * Sets battery dimensions.
+         * <p>
+         * <p>Note if you use this you cannot use <code>addBatteryDimension(int dimIndex, int dimVal)</code> anymore. Thus either build
+         * your dimensions with <code>addBatteryDimension(int dimIndex, int dimVal)</code> or set the already built dimensions with
+         * this method.
+         *
+         * @param battery battery of vehicle type
+         * @return this builder
+         * @throws IllegalArgumentException if batteryDimension has already been added
+         */
+        public Builder setBatteryDimensions(BatteryAM battery) {
+            if (dimensionAdded)
+                throw new IllegalArgumentException("Either build your dimension with build your dimensions with " +
+                    "addBatteryDimension(int dimIndex, int dimVal) or set the already built dimensions with .setBatteryDimensions(BatteryAM battery)." +
+                    "You used both methods.");
+            this.BatteryDimensions = battery;
+            return this;
+        }
+
+
         public Builder setProfile(String profile) {
             this.profile = profile;
             return this;
@@ -351,6 +397,10 @@ public class VehicleTypeImpl implements VehicleType {
         if (!typeId.equals(that.typeId)) return false;
         if (profile != null ? !profile.equals(that.profile) : that.profile != null) return false;
         if (!vehicleCostParams.equals(that.vehicleCostParams)) return false;
+        /**
+         * Ayman 09/02
+         */
+        if (!BatteryDimensions.equals(that.BatteryDimensions)) return false;
         return capacityDimensions.equals(that.capacityDimensions);
     }
 
@@ -362,6 +412,11 @@ public class VehicleTypeImpl implements VehicleType {
         result = 31 * result + (profile != null ? profile.hashCode() : 0);
         result = 31 * result + vehicleCostParams.hashCode();
         result = 31 * result + capacityDimensions.hashCode();
+        /**
+         * Ayman 08/02
+         * look for the usage of this code
+         */
+        result = 31 * result + BatteryDimensions.hashCode();
         temp = Double.doubleToLongBits(maxVelocity);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
@@ -374,6 +429,12 @@ public class VehicleTypeImpl implements VehicleType {
     private final VehicleTypeImpl.VehicleCostParams vehicleCostParams;
 
     private final Capacity capacityDimensions;
+
+    /**
+     * Ayman 08/02
+     */
+
+    private final BatteryAM BatteryDimensions;
 
     private final double maxVelocity;
 
@@ -390,6 +451,10 @@ public class VehicleTypeImpl implements VehicleType {
         maxVelocity = builder.maxVelo;
         vehicleCostParams = new VehicleCostParams(builder.fixedCost, builder.perTime, builder.perDistance, builder.perWaitingTime, builder.perServiceTime);
         capacityDimensions = builder.capacityDimensions;
+        /**
+         * Ayman 08/02
+         */
+        BatteryDimensions = builder.BatteryDimensions;
         profile = builder.profile;
     }
 
@@ -421,6 +486,7 @@ public class VehicleTypeImpl implements VehicleType {
     public String toString() {
         return "[typeId=" + typeId + "]" +
             "[capacity=" + capacityDimensions + "]" +
+            "[battery=" + BatteryDimensions + "]" +
             "[costs=" + vehicleCostParams + "]";
     }
 
@@ -432,6 +498,17 @@ public class VehicleTypeImpl implements VehicleType {
     @Override
     public Capacity getCapacityDimensions() {
         return capacityDimensions;
+    }
+
+    /**
+     * Ayman 08/02
+     * error: Method does not override method from its superclass
+     */
+
+
+    @Override
+    public BatteryAM getBatteryDimensions() {
+        return BatteryDimensions;
     }
 
     @Override

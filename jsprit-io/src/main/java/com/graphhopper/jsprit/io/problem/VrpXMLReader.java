@@ -581,6 +581,27 @@ public class VrpXMLReader {
                 }
             }
 
+            /**
+             * Ayman 09/02 - Adding Battery Range Dimension
+             */
+
+            String batteryString = typeConfig.getString("battery");
+            boolean batteryDimensionsExist = typeConfig.containsKey("battery-dimensions.dimension(0)");
+            if (batteryString != null && batteryDimensionsExist) {
+                throw new IllegalArgumentException("either use battery or battery-dimension, not both. prefer the use of 'battery-dimensions' over 'battery'.");
+            }
+
+            if (batteryString != null) {
+                typeBuilder.addBatteryDimension(0, Integer.parseInt(batteryString)); // TODO: should be changed to double
+            } else {
+                List<HierarchicalConfiguration> dimensionConfigs = typeConfig.configurationsAt("battery-dimensions.dimension");
+                for (HierarchicalConfiguration dimension : dimensionConfigs) {
+                    Integer index = dimension.getInt("[@index]");
+                    Integer value = dimension.getInt("");
+                    typeBuilder.addBatteryDimension(index, value);
+                }
+            }
+
             Double fix = typeConfig.getDouble("costs.fixed");
             Double timeC = typeConfig.getDouble("costs.time");
             Double distC = typeConfig.getDouble("costs.distance");

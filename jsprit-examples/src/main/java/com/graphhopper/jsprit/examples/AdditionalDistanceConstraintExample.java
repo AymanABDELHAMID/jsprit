@@ -133,7 +133,8 @@ public class AdditionalDistanceConstraintExample {
 
         //route length 618
         VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
-        new VrpXMLReader(vrpBuilder).read("../../../input/pickups_and_deliveries_solomon_r101_withoutTWs.xml");
+        new VrpXMLReader(vrpBuilder).read("C:\\Users\\AYMAN\\OneDrive - CentraleSupelec\\CentraleSupelec\\M2_MACLO\\Recherche\\Mémoire Thématique\\co" +
+            "de\\jsprit\\jsprit-examples\\input\\pickups_and_deliveries_solomon_r101_withoutTWs.xml");
         //builds a matrix based on euclidean distances; t_ij = euclidean(i,j) / 2; d_ij = euclidean(i,j);
         VehicleRoutingTransportCostsMatrix costMatrix = createMatrix(vrpBuilder);
         vrpBuilder.setRoutingCost(costMatrix);

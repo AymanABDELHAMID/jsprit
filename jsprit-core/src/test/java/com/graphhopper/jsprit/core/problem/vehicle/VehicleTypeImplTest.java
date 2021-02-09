@@ -190,4 +190,10 @@ public class VehicleTypeImplTest {
         VehicleType two = VehicleTypeImpl.Builder.newInstance("type").addCapacityDimension(0, 10).build();
         assertTrue(one.equals(two));
     }
+
+    /**
+     * @author Ayman
+     * TODO: Add test cases for battery dimension
+     */
+
 }

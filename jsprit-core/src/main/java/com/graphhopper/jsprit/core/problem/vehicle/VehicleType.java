@@ -42,11 +42,11 @@ public interface VehicleType {
     Capacity getCapacityDimensions();
 
     /**
-     * Returns vehicle Range.
+     * Returns vehicle Battery Dimensions.
      *
      * @return {@link com.graphhopper.jsprit.core.problem.BatteryAM}
      */
-    BatteryAM getRange();
+    BatteryAM getBatteryDimensions();
 
 
     /**

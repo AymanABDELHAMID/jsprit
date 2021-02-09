@@ -28,6 +28,7 @@ import com.graphhopper.jsprit.core.problem.solution.route.activity.DefaultTourAc
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl; // TODO: remove
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeKey;
 import com.graphhopper.jsprit.core.util.Coordinate;
 import com.graphhopper.jsprit.core.util.CrowFlyCosts;
@@ -88,6 +89,12 @@ public class VehicleRoutingProblem {
         private FleetSize fleetSize = FleetSize.INFINITE;
 
         private Map<String, VehicleType> vehicleTypes = new HashMap<>();
+
+        /**
+         * Ayman
+         */
+
+        private Map<String, VehicleType> BatteryDimensions = new HashMap<>();
 
         private Collection<VehicleRoute> initialRoutes = new ArrayList<>();
 
@@ -551,6 +558,10 @@ public class VehicleRoutingProblem {
      */
     private final Collection<VehicleType> vehicleTypes;
 
+    /**
+     * Ayman - return vehicle battery dimensons
+     */
+    private final Collection<VehicleType> BatteryDimensions;
 
     private final Collection<VehicleRoute> initialVehicleRoutes;
 
@@ -573,6 +584,7 @@ public class VehicleRoutingProblem {
         this.fleetSize = builder.fleetSize;
         this.vehicles = builder.uniqueVehicles;
         this.vehicleTypes = builder.vehicleTypes.values();
+        this.BatteryDimensions = builder.BatteryDimensions.values();
         this.initialVehicleRoutes = builder.initialRoutes;
         this.transportCosts = builder.transportCosts;
         this.activityCosts = builder.activityCosts;
@@ -588,7 +600,7 @@ public class VehicleRoutingProblem {
     @Override
     public String toString() {
         return "[fleetSize=" + fleetSize + "][#jobs=" + jobs.size() + "][#vehicles=" + vehicles.size() + "][#vehicleTypes=" + vehicleTypes.size() + "][" +
-            "transportCost=" + transportCosts + "][activityCosts=" + activityCosts + "]";
+            "transportCost=" + transportCosts + "][activityCosts=" + activityCosts + "]"; // TODO: add battery dimensions here
     }
 
     /**
@@ -641,6 +653,15 @@ public class VehicleRoutingProblem {
         return Collections.unmodifiableCollection(vehicleTypes);
     }
 
+    /**
+     * Ayman 09/02
+     * Returns the battery dimension.
+     *
+     * @see com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl
+     */
+    public Collection<VehicleType>  getBatteryDimensions() {
+        return Collections.unmodifiableCollection(BatteryDimensions);
+    }
 
     /**
      * Returns the entire, unmodifiable collection of vehicles.

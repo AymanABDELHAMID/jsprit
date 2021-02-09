@@ -245,6 +245,7 @@ public static class Builder {
         return Arrays.hashCode(dimensions);
     }
 
+
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder("[noDimensions=" + getNuOfDimensions() + "]");

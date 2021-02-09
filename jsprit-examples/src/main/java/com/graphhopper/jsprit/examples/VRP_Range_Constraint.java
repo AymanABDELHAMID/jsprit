@@ -28,8 +28,12 @@ import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 import com.graphhopper.jsprit.io.problem.VrpXMLReader;
 import org.apache.logging.log4j.Logger;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl.Builder;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 
 import java.util.Collection;
+import java.io.File;
 // import the library that modifies vehicle type (BEV)
 
 /*
@@ -144,10 +148,10 @@ public class VRP_Range_Constraint  {
     }
     public static void main(String[] args) {
 
-        //route length 618
         VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
-        new VrpXMLReader(vrpBuilder).read("input/pickups_and_deliveries_solomon_r101_withoutTWs.xml");
-        //builds a matrix based on euclidean distances; t_ij = euclidean(i,j) / 2; d_ij = euclidean(i,j);
+        new VrpXMLReader(vrpBuilder).read("C:\\Users\\AYMAN\\OneDrive - CentraleSupelec\\CentraleSupelec\\M2_MACLO\\Recherche\\Mémoire Thématique\\co"+
+            "de\\jsprit\\jsprit-examples\\input\\pickups_and_deliveries_withBEV_withoutTWs_AM.xml");
+        //builds a matrix based on euclidean distances; t_ij = euclidean(i,j) / 2; d_ij = euclidean(i,j)
         VehicleRoutingTransportCostsMatrix costMatrix = createMatrix(vrpBuilder);
         vrpBuilder.setRoutingCost(costMatrix);
         VehicleRoutingProblem vrp = vrpBuilder.build();
@@ -156,15 +160,19 @@ public class VRP_Range_Constraint  {
         StateManager stateManager = new StateManager(vrp); //head of development - upcoming release (v1.4)
 
         StateId distanceStateId = stateManager.createStateId("distance"); //head of development - upcoming release (v1.4)
-        stateManager.addStateUpdater(new AdditionalDistanceConstraintExample.DistanceUpdater(distanceStateId, stateManager, costMatrix));
+        stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, costMatrix));
 
         ConstraintManager constraintManager = new ConstraintManager(vrp, stateManager);
-        constraintManager.addConstraint(new AdditionalDistanceConstraintExample.DistanceConstraint(120., distanceStateId, stateManager, costMatrix), ConstraintManager.Priority.CRITICAL);
+        /**
+         * Adding maximum distance from maximum battery range
+         */
+        //vrp.getBatteryDimensions();
+        final double MAX_Range = 500.;
+        constraintManager.addConstraint(new RangeConstraint(MAX_Range, distanceStateId, stateManager, costMatrix), ConstraintManager.Priority.CRITICAL);
 
         VehicleRoutingAlgorithm vra = Jsprit.Builder.newInstance(vrp).setStateAndConstraintManager(stateManager,constraintManager)
             .buildAlgorithm();
-//        vra.setMaxIterations(250); //v1.3.1
-        vra.setMaxIterations(250); //head of development - upcoming release (v1.4)
+        vra.setMaxIterations(250);
 
         Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
 
@@ -187,6 +195,6 @@ public class VRP_Range_Constraint  {
         return matrixBuilder.build();
     }
 
-
+//TODO: Add solution analyzer, check example in VRPWithBackhaulsExample2
 }
 

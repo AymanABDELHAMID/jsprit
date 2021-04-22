@@ -18,6 +18,7 @@
 package com.graphhopper.jsprit.core.problem;
 
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingEnergyCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.cost.WaitingTimeCosts;
 import com.graphhopper.jsprit.core.problem.job.*;
@@ -73,6 +74,8 @@ public class VehicleRoutingProblem {
         }
 
         private VehicleRoutingTransportCosts transportCosts;
+
+        private VehicleRoutingEnergyCosts energyCosts;
 
         private VehicleRoutingActivityCosts activityCosts = new WaitingTimeCosts();
 
@@ -176,6 +179,18 @@ public class VehicleRoutingProblem {
          */
         public Builder setRoutingCost(VehicleRoutingTransportCosts costs) {
             this.transportCosts = costs;
+            return this;
+        }
+
+        /**
+         * Sets energy costs.
+         *
+         * @param costs the energyCosts
+         * @return builder
+         * @see com.graphhopper.jsprit.core.problem.cost.VehicleRoutingEnergyCosts
+         */
+        public Builder setEnergyCost(VehicleRoutingEnergyCosts costs) {
+            this.energyCosts = costs;
             return this;
         }
 
@@ -400,7 +415,7 @@ public class VehicleRoutingProblem {
         /**
          * Sets the activity-costs.
          * <p>
-         * <p>By default it is set to zero.
+         * <p> By default it is set to zero.
          *
          * @param activityCosts activity costs of the problem
          * @return this builder
@@ -431,8 +446,13 @@ public class VehicleRoutingProblem {
          */
         public VehicleRoutingProblem build() {
             if (transportCosts == null) {
-                transportCosts = new CrowFlyCosts(getLocations());
+                transportCosts = new CrowFlyCosts(getLocations()); // adds costs using CrowFlyCosts TODO: check out how it calculates cost
             }
+
+            if (energyCosts == null) {
+                energyCosts = new CrowFlyCosts(getLocations()); // adds a fixed energy consumption value for all arcs
+            }
+
             for (Job job : tentativeJobs.values()) {
                 if (!jobsInInitialRoutes.containsKey(job.getId())) {
                     addJobToFinalJobMapAndCreateActivities(job);
@@ -534,6 +554,11 @@ public class VehicleRoutingProblem {
      * contains transportation costs, i.e. the costs traveling from location A to B
      */
     private final VehicleRoutingTransportCosts transportCosts;
+
+    /**
+     * contains consumption costs, i.e. the energy consumption traveling from location A to B
+     */
+    private final VehicleRoutingEnergyCosts energyCosts;
 
     /**
      * contains activity costs, i.e. the costs imposed by an activity
@@ -682,6 +707,16 @@ public class VehicleRoutingProblem {
     public VehicleRoutingTransportCosts getTransportCosts() {
         return transportCosts;
     }
+
+    /**
+         * Returns energy consumption costs.
+         *
+         * @return energyConsumption
+         * @see VehicleRoutingEnergyCosts
+         */
+        public VehicleRoutingEnergyCosts getEnergyConsumption() {
+            return energyCosts;
+        }
 
     /**
      * Returns activityCosts.

@@ -19,14 +19,14 @@ package com.graphhopper.jsprit.core.problem.cost;
 
 
 /**
- * Interface for transportCost and transportTime.
+ * Interface for energyCost and transport time that will affect the energy consumption.
  * <p>
  * <p>Transport here is what happens between two activities within the transport system, i.e. in the physical transport network. And
- * must give the answer of how long does it take from A to B, and how much does thVehicleRoutingTransportCostsis cost.
+ * must give the answer of how much energy is consumed in this.
  *
- * @author schroeder
+ * @author Ayman M.
  */
 
-public interface VehicleRoutingTransportCosts extends TransportTime, TransportCost, TransportDistance {
+public interface VehicleRoutingEnergyCosts extends TransportTime, TransportCost, TransportDistance, TransportConsumption {
 
 }

@@ -242,7 +242,7 @@ public class AM_example_2_BEV_WDist_Const {
                 Coordinate fromCoord = vrpBuilder.getLocationMap().get(from);
                 Coordinate toCoord = vrpBuilder.getLocationMap().get(to);
                 double distance = EuclideanDistanceCalculator.calculateDistance(fromCoord, toCoord);
-                matrixBuilder.addTransportDistance(from, to, distance);
+                matrixBuilder.addTransportDistance(from, to, distance); // what is the distance unit
                 matrixBuilder.addTransportTime(from, to, (distance / 2.));
             }
         }

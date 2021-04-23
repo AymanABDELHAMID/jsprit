@@ -7,4 +7,9 @@ public class EnergyConsumptionCalculator {
         double yDiff = coord1.getY() - coord2.getY();
         return Math.sqrt((xDiff * xDiff) + (yDiff * yDiff));
     }
+
+    public static double calculateConsumptionConstant(Coordinate coord1, Coordinate coord2) {
+        double constant_value = 10;
+        return constant_value;
+    }
 }

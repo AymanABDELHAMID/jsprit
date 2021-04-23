@@ -33,6 +33,7 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl; // TODO: rem
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeKey;
 import com.graphhopper.jsprit.core.util.Coordinate;
 import com.graphhopper.jsprit.core.util.CrowFlyCosts;
+import com.graphhopper.jsprit.core.util.constantConsumptionCost;
 import com.graphhopper.jsprit.core.util.Locations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -415,7 +416,7 @@ public class VehicleRoutingProblem {
         /**
          * Sets the activity-costs.
          * <p>
-         * <p> By default it is set to zero.
+         * <p> By default it is set to zero
          *
          * @param activityCosts activity costs of the problem
          * @return this builder
@@ -446,11 +447,11 @@ public class VehicleRoutingProblem {
          */
         public VehicleRoutingProblem build() {
             if (transportCosts == null) {
-                transportCosts = new CrowFlyCosts(getLocations()); // adds costs using CrowFlyCosts TODO: check out how it calculates cost
+                transportCosts = new CrowFlyCosts(getLocations()); // adds costs using CrowFlyCosts
             }
 
             if (energyCosts == null) {
-                energyCosts = new CrowFlyCosts(getLocations()); // adds a fixed energy consumption value for all arcs
+                energyCosts = new constantConsumptionCost(getLocations()); // adds a fixed energy consumption value for all arcs
             }
 
             for (Job job : tentativeJobs.values()) {
@@ -612,6 +613,7 @@ public class VehicleRoutingProblem {
         this.BatteryDimensions = builder.BatteryDimensions.values();
         this.initialVehicleRoutes = builder.initialRoutes;
         this.transportCosts = builder.transportCosts;
+        this.energyCosts = builder.energyCosts;
         this.activityCosts = builder.activityCosts;
         this.activityMap = builder.activityMap;
         this.nuActivities = builder.activityIndexCounter;
@@ -625,7 +627,7 @@ public class VehicleRoutingProblem {
     @Override
     public String toString() {
         return "[fleetSize=" + fleetSize + "][#jobs=" + jobs.size() + "][#vehicles=" + vehicles.size() + "][#vehicleTypes=" + vehicleTypes.size() + "][" +
-            "transportCost=" + transportCosts + "][activityCosts=" + activityCosts + "]"; // TODO: add battery dimensions here
+            "transportCost=" + transportCosts + "energyCost=" + energyCosts + "][activityCosts=" + activityCosts + "]"; // TODO: add battery dimensions here
     }
 
     /**
@@ -714,7 +716,7 @@ public class VehicleRoutingProblem {
          * @return energyConsumption
          * @see VehicleRoutingEnergyCosts
          */
-        public VehicleRoutingEnergyCosts getEnergyConsumption() {
+    public VehicleRoutingEnergyCosts getEnergyConsumption() {
             return energyCosts;
         }
 

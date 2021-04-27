@@ -17,6 +17,7 @@
  */
 package com.graphhopper.jsprit.core.util;
 
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingEnergyCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 
 public class CostFactory {
@@ -65,5 +66,27 @@ public class CostFactory {
 
         };
         return new CrowFlyCosts(locations);
+    }
+
+    /**
+     * Return Constant energyCosts.
+     * <p>
+     * This retrieves coordinates from locationIds. LocationId has to be locId="{x},{y}". For example,
+     * locId="10,10" is interpreted such that x=10 and y=10.
+     *
+     * @return energyCost
+     */
+    public static VehicleRoutingEnergyCosts createConstantEnergyCosts() {
+        Locations locations = new Locations() { // Implementation of GetCoord.
+
+            @Override
+            public Coordinate getCoord(String id) {
+                String[] splitted = id.split(",");
+                return Coordinate.newInstance(Double.parseDouble(splitted[0]),
+                    Double.parseDouble(splitted[1]));
+            }
+
+        };
+        return new constantConsumptionCost(locations);
     }
 }

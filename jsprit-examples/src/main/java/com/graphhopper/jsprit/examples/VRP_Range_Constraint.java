@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  */
 
 /**
- * @author Ayman
+ * @author Ayman (Not the correct approach)
  *
  *         !! No recharging or refueling is integrated !!
  *         Vehicles are considered totally full at the beginning.

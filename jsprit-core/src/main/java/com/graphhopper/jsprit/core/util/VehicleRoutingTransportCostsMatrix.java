@@ -109,6 +109,8 @@ public class VehicleRoutingTransportCostsMatrix extends AbstractForwardVehicleRo
 
         private Map<RelationKey, Double> times = new HashMap<RelationKey, Double>();
 
+        //private Map<RelationKey, Double> energy = new HashMap<RelationKey, Double>();
+
         private boolean distancesSet = false;
 
         private boolean timesSet = false;

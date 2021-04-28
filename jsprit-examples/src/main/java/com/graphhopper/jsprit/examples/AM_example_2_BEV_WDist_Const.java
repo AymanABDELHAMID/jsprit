@@ -248,4 +248,9 @@ public class AM_example_2_BEV_WDist_Const {
         }
         return matrixBuilder.build();
     }
+
+    /*
+    Constructing an energy cost matrix
+     */
+    //double ii = vehicle.
 }

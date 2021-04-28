@@ -131,7 +131,7 @@ public class VehicleRoutingEnergyCostMatrix extends AbstractForwardVehicleEnergy
         consumptions.putAll(builder.consumptions);
         consumptionsSet = builder.consumptionsSet;
     }
-    
+
 
     @Override
     public double getEnergyConsumption(Location from, Location to, double departureTime, Vehicle vehicle){

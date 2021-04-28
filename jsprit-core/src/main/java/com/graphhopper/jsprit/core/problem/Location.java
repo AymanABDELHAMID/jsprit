@@ -23,7 +23,7 @@ import com.graphhopper.jsprit.core.util.Coordinate;
 /**
  * Created by schroeder on 16.12.14.
  */
-public final class Location implements HasIndex, HasId {
+public final class Location implements HasIndex, HasId, HasLoad { // Load will be added to each location based on the nature of the problem, converted into KGs
 
     /**
      * Factory method (and shortcut) for creating a location object just with x and y coordinates.

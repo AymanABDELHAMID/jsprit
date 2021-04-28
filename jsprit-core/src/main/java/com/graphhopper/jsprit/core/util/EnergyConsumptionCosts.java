@@ -19,20 +19,20 @@ public class EnergyConsumptionCosts extends AbstractForwardVehicleEnergyTranspor
 
     @Override
     public double getEnergyConsumption(Location from, Location to, double departureTime, Vehicle vehicle){
-        double energy = calculateConsumption(from, to);
+        double energy = calculateConsumption(from, to, vehicle.getType(), from.getLoad());
         if (vehicle != null && vehicle.getType() != null) {
             return energy * vehicle.getType().getVehicleCostParams().perDistanceUnit; // TODO: change to perEnergyUnit
         }
         return energy;
     }
 
-    double calculateConsumption(Location fromLocation, Location toLocation) {
-        return calculateConsumption(fromLocation.getCoordinate(), toLocation.getCoordinate());
+    double calculateConsumption(Location fromLocation, Location toLocation, Vehicle vehicle) {
+        return calculateConsumption(fromLocation.getCoordinate(), toLocation.getCoordinate(), vehicle.getType());
     }
 
-    double calculateConsumption(Coordinate from, Coordinate to) {
+    double calculateConsumption(Coordinate from, Coordinate to, String type) {
         try {
-            return EnergyConsumptionCalculator.calculateConsumption(from, to) * detourFactor;
+            return EnergyConsumptionCalculator.calculateConsumption(from, to, type, load) * detourFactor;
         } catch (NullPointerException e) {
             throw new NullPointerException("Coordinates are Missing");
             // TODO: vehicle.getType().getVehicledDescription.frontal_area
@@ -64,15 +64,4 @@ public class EnergyConsumptionCosts extends AbstractForwardVehicleEnergyTranspor
             throw new NullPointerException("cannot calculate euclidean distance. coordinates are missing. either add coordinates or use another transport-cost-calculator.");
         }
     }
-
-    @Override
-    public double getDistance(Location from, Location to, double departureTime, Vehicle vehicle) {
-        return calculateDistance(from, to);
-    }
-
-    @Override
-    public double getTransportTime(Location from, Location to, double time, Driver driver, Vehicle vehicle) {
-        return calculateDistance(from, to) / speed;
-    }
-
 }

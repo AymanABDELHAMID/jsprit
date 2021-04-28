@@ -1,13 +1,8 @@
 package com.graphhopper.jsprit.core.util;
 
 import com.graphhopper.jsprit.core.problem.cost.AbstractForwardVehicleEnergyTransportCost;
-import com.graphhopper.jsprit.core.problem.cost.AbstractForwardVehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.Location;
-import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl.VehicleCostParams;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,8 +131,7 @@ public class VehicleRoutingEnergyCostMatrix extends AbstractForwardVehicleEnergy
         consumptions.putAll(builder.consumptions);
         consumptionsSet = builder.consumptionsSet;
     }
-
-
+    
 
     @Override
     public double getEnergyConsumption(Location from, Location to, double departureTime, Vehicle vehicle){
@@ -147,7 +141,7 @@ public class VehicleRoutingEnergyCostMatrix extends AbstractForwardVehicleEnergy
     public double getConsumption(String fromId, String toId) {
         if (fromId.equals(toId)) return 0.0;
         if (!consumptionsSet) return 0.0;
-        VehicleRoutingTransportCostsMatrix.RelationKey key = VehicleRoutingTransportCostsMatrix.RelationKey.newKey(fromId, toId);
+        VehicleRoutingEnergyCostMatrix.RelationKey key = VehicleRoutingEnergyCostMatrix.RelationKey.newKey(fromId, toId);
         if (!isSymmetric) {
             if (consumptions.containsKey(key)) return consumptions.get(key);
             else
@@ -155,7 +149,7 @@ public class VehicleRoutingEnergyCostMatrix extends AbstractForwardVehicleEnergy
         } else {
             Double time = consumptions.get(key);
             if (time == null) {
-                time = consumptions.get(VehicleRoutingTransportCostsMatrix.RelationKey.newKey(toId, fromId));
+                time = consumptions.get(VehicleRoutingEnergyCostMatrix.RelationKey.newKey(toId, fromId));
             }
             if (time != null) return time;
             else
@@ -163,60 +157,6 @@ public class VehicleRoutingEnergyCostMatrix extends AbstractForwardVehicleEnergy
         }
     }
 
-    @Override
-    public double getDistance(Location from, Location to, double departureTime, Vehicle vehicle){
-        return getDistance(from.getId(), to.getId());
-    }
 
-    /**
-     * Returns the distance fromId to toId.
-     *
-     * @param fromId from locationId
-     * @param toId   to locationId
-     * @return the distance from fromId to toId
-     * @throws IllegalStateException if distance of fromId -> toId is not found
-     */
-    public double getDistance(String fromId, String toId) {
-        if (fromId.equals(toId)) return 0.0;
-        if (!distancesSet) return 0.0;
-        VehicleRoutingTransportCostsMatrix.RelationKey key = VehicleRoutingTransportCostsMatrix.RelationKey.newKey(fromId, toId);
-        if (!isSymmetric) {
-            if (distances.containsKey(key)) return distances.get(key);
-            else
-                throw new IllegalStateException("distance value for relation from " + fromId + " to " + toId + " does not exist");
-        } else {
-            Double time = distances.get(key);
-            if (time == null) {
-                time = distances.get(VehicleRoutingTransportCostsMatrix.RelationKey.newKey(toId, fromId));
-            }
-            if (time != null) return time;
-            else
-                throw new IllegalStateException("distance value for relation from " + fromId + " to " + toId + " does not exist");
-        }
-    }
-
-    @Override
-    public double getTransportTime(Location from, Location to, double departureTime, Driver driver, Vehicle vehicle){
-        return getTime(from.getId(), to.getId());
-    }
-
-    private double getTime(String fromId, String toId) {
-        if (fromId.equals(toId)) return 0.0;
-        if (!timesSet) return 0.0;
-        VehicleRoutingTransportCostsMatrix.RelationKey key = VehicleRoutingTransportCostsMatrix.RelationKey.newKey(fromId, toId);
-        if (!isSymmetric) {
-            if (times.containsKey(key)) return times.get(key);
-            else
-                throw new IllegalStateException("time value for relation from " + fromId + " to " + toId + " does not exist");
-        } else {
-            Double time = times.get(key);
-            if (time == null) {
-                time = times.get(VehicleRoutingTransportCostsMatrix.RelationKey.newKey(toId, fromId));
-            }
-            if (time != null) return time;
-            else
-                throw new IllegalStateException("time value for relation from " + fromId + " to " + toId + " does not exist");
-        }
-    }
 
 }

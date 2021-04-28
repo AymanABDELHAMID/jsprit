@@ -27,6 +27,5 @@ package com.graphhopper.jsprit.core.problem.cost;
  * @author Ayman M.
  */
 
-public interface VehicleRoutingEnergyCosts extends TransportTime, TransportDistance, TransportConsumption {
-// TODO: Check how CrowFlyCosts returns
+public interface VehicleRoutingEnergyCosts extends TransportConsumption {
 }

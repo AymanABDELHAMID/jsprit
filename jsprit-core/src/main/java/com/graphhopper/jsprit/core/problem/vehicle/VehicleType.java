@@ -19,6 +19,7 @@ package com.graphhopper.jsprit.core.problem.vehicle;
 
 import com.graphhopper.jsprit.core.problem.Capacity;
 import com.graphhopper.jsprit.core.problem.BatteryAM;
+import com.graphhopper.jsprit.core.util.VehicleProfile;
 
 /**
  * Basic interface for vehicle-type-data.
@@ -57,13 +58,33 @@ public interface VehicleType {
     double getMaxVelocity();
 
     /**
+     * Returns the average velocity of this vehicle type
+     *
+     * @return average velocity
+     */
+    double getAverageVelocity();
+
+    /**
      * Return the cost-parameter of this vehicle-type.
      *
      * @return parameter
      */
     VehicleTypeImpl.VehicleCostParams getVehicleCostParams();
 
-    String getProfile();
+    /**
+     * 29.04.21
+     * Ayman M. Profile transformed from String --> Object
+     * @return
+     */
+    VehicleProfile getProfile();
+
+    /**
+     * 30.04.21
+     * Ayman M.
+     * @return energy type
+     */
+
+    int getEnergyType();
 
     /**
      * @return User-specific domain data associated with the vehicle type

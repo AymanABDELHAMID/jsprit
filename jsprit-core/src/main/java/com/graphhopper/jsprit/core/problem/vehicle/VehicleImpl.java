@@ -453,6 +453,7 @@ public class VehicleImpl extends AbstractVehicle {
     /**
      * Two vehicles are equal if they have the same id and if their types are equal.
      */
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

@@ -134,7 +134,7 @@ public class VehicleRoutingEnergyCostMatrix extends AbstractForwardVehicleEnergy
 
 
     @Override
-    public double getEnergyConsumption(Location from, Location to, double departureTime, Vehicle vehicle){
+    public double getEnergyConsumption(Location from, Location to, Vehicle vehicle){
         return getConsumption(from.getId(), to.getId());
     }
 

@@ -4,6 +4,7 @@ import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.cost.AbstractForwardVehicleEnergyTransportCost;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.util.EuclideanCosts;
 
 public class EnergyConsumptionCosts extends AbstractForwardVehicleEnergyTransportCost {
@@ -18,27 +19,35 @@ public class EnergyConsumptionCosts extends AbstractForwardVehicleEnergyTranspor
     }
 
     @Override
-    public double getEnergyConsumption(Location from, Location to, double departureTime, Vehicle vehicle){
+    public double getEnergyConsumption(Location from, Location to, Vehicle vehicle){
         double energy = calculateConsumption(from, to, vehicle.getType(), from.getLoad());
-        if (vehicle != null && vehicle.getType() != null) {
-            return energy * vehicle.getType().getVehicleCostParams().perDistanceUnit; // TODO: change to perEnergyUnit
+        if (vehicle != null && vehicle.getType() != null) { // TODO: add energy_type
+            if (vehicle.getType().getEnergyType() == 1) {
+                return energy * vehicle.getType().getVehicleCostParams().perEnergyUnit_Fuel;}
+            else if (vehicle.getType().getEnergyType() == 2) {
+                return energy * vehicle.getType().getVehicleCostParams().perEnergyUnit_Battery;
+            }
+            else { return energy * vehicle.getType().getVehicleCostParams().perEnergyUnit_Fuel;
+            // TODO: deal with hybrid setting
+            }
         }
         return energy;
     }
 
-    double calculateConsumption(Location fromLocation, Location toLocation, Vehicle vehicle) {
-        return calculateConsumption(fromLocation.getCoordinate(), toLocation.getCoordinate(), vehicle.getType());
+    double calculateConsumption(Location from, Location to, VehicleType type, double load) {
+        return calculateConsumption(from.getCoordinate(), to.getCoordinate(), type, load);
     }
 
-    double calculateConsumption(Coordinate from, Coordinate to, String type) {
+    double calculateConsumption(Coordinate coordinate, Coordinate coordinate1, VehicleType type, double load) {
         try {
-            return EnergyConsumptionCalculator.calculateConsumption(from, to, type, load) * detourFactor;
+            return EnergyConsumptionCalculator.calculateConsumption(coordinate, coordinate1, type, load) * detourFactor;
         } catch (NullPointerException e) {
             throw new NullPointerException("Coordinates are Missing");
-            // TODO: vehicle.getType().getVehicledDescription.frontal_area
+            // TODO: vehicle.getProfile().getVehicleDescription.frontal_area
             // TODO: Driver.getType().getDriverDescription.aux_power_coefficient
         }
     }
+
 
     double calculateConsumptionConstant(Location fromLocation, Location toLocation) {
         return calculateConsumptionConstant(fromLocation.getCoordinate(), toLocation.getCoordinate());

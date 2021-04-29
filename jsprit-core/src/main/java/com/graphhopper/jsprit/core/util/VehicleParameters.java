@@ -1,10 +1,14 @@
 package com.graphhopper.jsprit.core.util;
 
+/*
+    Note to self: maybe parameters are not needed
+ */
+
 public class VehicleParameters {
 
     public static VehicleParameters newInstance(String type) {
         return new VehicleParameters(type);
-    }
+    } // Location.Builder.newInstance().setIndex(index).build();
 
     private final String type;
     //private final double weight;
@@ -27,7 +31,7 @@ public class VehicleParameters {
     @Override
     public String toString() {
         return "[Vehicle Type=" + type + "][Vehicle Estimated Mass=" + type + "]";
-    }
+    } // TODO: Change to profile
 
     @Override
     public int hashCode() {

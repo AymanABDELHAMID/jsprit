@@ -25,6 +25,8 @@ import com.graphhopper.jsprit.core.util.Coordinate;
  */
 public final class Location implements HasIndex, HasId, HasLoad { // Load will be added to each location based on the nature of the problem, converted into KGs
 
+    // TODO: create a factory method to create a location object with coordinates, and load.
+
     /**
      * Factory method (and shortcut) for creating a location object just with x and y coordinates.
      *
@@ -67,6 +69,8 @@ public final class Location implements HasIndex, HasId, HasLoad { // Load will b
         private String name = "";
 
         private Object userData;
+
+        private double load = 10; // default value of the load in kg.
 
         public static Builder newInstance() {
             return new Builder();
@@ -134,6 +138,18 @@ public final class Location implements HasIndex, HasId, HasLoad { // Load will b
             return this;
         }
 
+        /**
+         * Adds Load, e.g. weight of the pickup load, to location
+         *
+         * @param load load of location
+         * @return this Builder
+         */
+        public Builder setLoad(double load) {
+            if (load < 0) throw new IllegalArgumentException("load must be >= 0");
+            this.load = load;
+            return this;
+        }
+
         public Location build() {
             if (id == null && coordinate == null) {
                 if (index == -1) throw new IllegalArgumentException("either id or coordinate or index must be set");
@@ -159,6 +175,8 @@ public final class Location implements HasIndex, HasId, HasLoad { // Load will b
 
     private final String name;
 
+    private final double load;
+
     private Object userData;
 
     private Location(Builder builder) {
@@ -167,6 +185,7 @@ public final class Location implements HasIndex, HasId, HasLoad { // Load will b
         this.coordinate = builder.coordinate;
         this.id = builder.id;
         this.name = builder.name;
+        this.load = builder.load;
     }
 
     /**
@@ -194,6 +213,15 @@ public final class Location implements HasIndex, HasId, HasLoad { // Load will b
         return name;
     }
 
+    /**
+     * @author Ayman M.
+     * @return User-specific Load data associated by the job
+     */
+    @Override
+    public double getLoad(){
+        return load;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -214,6 +242,6 @@ public final class Location implements HasIndex, HasId, HasLoad { // Load will b
 
     @Override
     public String toString() {
-        return "[id=" + id + "][index=" + index + "][coordinate=" + coordinate + "]";
+        return "[id=" + id + "][index=" + index + "][coordinate=" + coordinate + "][ Load=" + load + "]";
     }
 }

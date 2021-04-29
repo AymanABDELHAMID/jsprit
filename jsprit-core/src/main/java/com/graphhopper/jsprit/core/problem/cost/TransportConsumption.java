@@ -6,9 +6,9 @@ import com.graphhopper.jsprit.core.problem.driver.Driver;
 
 /**
  * Interface for transport energy consumption
- * @author Ayman
+ * @author Ayman M.
  */
 public interface TransportConsumption extends ForwardEnergyCost, BackwardEnergyCost {
 
-   public double getEnergyConsumption(Location from, Location to, double departureTime, Vehicle vehicle);
+   public double getEnergyConsumption(Location from, Location to, Vehicle vehicle);
 }

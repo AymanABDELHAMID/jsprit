@@ -106,4 +106,28 @@ public class LocationTest {
         assertNull(three.getUserData());
     }
 
+    /**
+     * @author Ayman M.
+     * Testing location newly added load parameter
+     */
+    @Test
+    public void whenLoadSet_build() {
+        Location l = Location.Builder.newInstance().setIndex(1).setLoad(20).build();
+        Assert.assertEquals(20., l.getLoad(), 0.001);
+        Assert.assertTrue(true);
+    }
+
+    @Test
+    public void whenLocationBuilt_defaultValue() {
+        Location l = Location.Builder.newInstance().setIndex(1).build();
+        Assert.assertEquals(10., l.getLoad(), 0.001);
+        Assert.assertTrue(true);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void whenLoadSmallerZero_throwException() {
+        Location l = Location.Builder.newInstance().setIndex(1).setLoad(-1).build();
+    }
+
 }

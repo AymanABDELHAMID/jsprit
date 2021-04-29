@@ -20,6 +20,7 @@ package com.graphhopper.jsprit.core.problem.vehicle;
 
 import com.graphhopper.jsprit.core.problem.Capacity;
 import com.graphhopper.jsprit.core.problem.BatteryAM;
+import com.graphhopper.jsprit.core.util.VehicleProfile;
 
 /**
  * Implementation of {@link VehicleType}.
@@ -32,6 +33,8 @@ public class VehicleTypeImpl implements VehicleType {
 
     /**
      * CostParameter consisting of fixed cost parameter, time-based cost parameter and distance-based cost parameter.
+     * Ayman M.
+     * Adding Cost parameters related to energy consumption
      *
      * @author schroeder
      */
@@ -48,6 +51,11 @@ public class VehicleTypeImpl implements VehicleType {
         public final double perDistanceUnit;
         public final double perWaitingTimeUnit;
         public final double perServiceTimeUnit;
+        /*
+        Energy consumption cost parameters:
+         */
+        public final double perEnergyUnit_Battery;
+        public final double perEnergyUnit_Fuel;
 
         private VehicleCostParams(double fix, double perTimeUnit, double perDistanceUnit) {
             super();
@@ -56,6 +64,8 @@ public class VehicleTypeImpl implements VehicleType {
             this.perDistanceUnit = perDistanceUnit;
             this.perWaitingTimeUnit = 0.;
             this.perServiceTimeUnit = 0.;
+            this.perEnergyUnit_Battery = 1.;
+            this.perEnergyUnit_Fuel = 1.;
         }
 
         public VehicleCostParams(double fix, double perTimeUnit, double perDistanceUnit, double perWaitingTimeUnit) {
@@ -64,6 +74,8 @@ public class VehicleTypeImpl implements VehicleType {
             this.perDistanceUnit = perDistanceUnit;
             this.perWaitingTimeUnit = perWaitingTimeUnit;
             this.perServiceTimeUnit = 0.;
+            this.perEnergyUnit_Battery = 1.;
+            this.perEnergyUnit_Fuel = 1.;
         }
 
         public VehicleCostParams(double fix, double perTimeUnit, double perDistanceUnit, double perWaitingTimeUnit, double perServiceTimeUnit) {
@@ -72,6 +84,28 @@ public class VehicleTypeImpl implements VehicleType {
             this.perDistanceUnit = perDistanceUnit;
             this.perWaitingTimeUnit = perWaitingTimeUnit;
             this.perServiceTimeUnit = perServiceTimeUnit;
+            this.perEnergyUnit_Battery = 1.;
+            this.perEnergyUnit_Fuel = 1.;
+        }
+
+        public VehicleCostParams(double fix, double perTimeUnit, double perDistanceUnit, double perWaitingTimeUnit, double perServiceTimeUnit, double perEnergyUnit_Battery) {
+            this.fix = fix;
+            this.perTransportTimeUnit = perTimeUnit;
+            this.perDistanceUnit = perDistanceUnit;
+            this.perWaitingTimeUnit = perWaitingTimeUnit;
+            this.perServiceTimeUnit = perServiceTimeUnit;
+            this.perEnergyUnit_Battery = perEnergyUnit_Battery;
+            this.perEnergyUnit_Fuel = 1.;
+        }
+
+        public VehicleCostParams(double fix, double perTimeUnit, double perDistanceUnit, double perWaitingTimeUnit, double perServiceTimeUnit, double perEnergyUnit_Battery, double perEnergyUnit_Fuel) {
+            this.fix = fix;
+            this.perTransportTimeUnit = perTimeUnit;
+            this.perDistanceUnit = perDistanceUnit;
+            this.perWaitingTimeUnit = perWaitingTimeUnit;
+            this.perServiceTimeUnit = perServiceTimeUnit;
+            this.perEnergyUnit_Battery = perEnergyUnit_Battery;
+            this.perEnergyUnit_Fuel = perEnergyUnit_Fuel;
         }
 
         @Override
@@ -107,6 +141,10 @@ public class VehicleTypeImpl implements VehicleType {
             result = 31 * result + (int) (temp ^ (temp >>> 32));
             temp = Double.doubleToLongBits(perServiceTimeUnit);
             result = 31 * result + (int) (temp ^ (temp >>> 32));
+            temp = Double.doubleToLongBits(perEnergyUnit_Battery);
+            result = 31 * result + (int) (temp ^ (temp >>> 32));
+            temp = Double.doubleToLongBits(perEnergyUnit_Fuel);
+            result = 31 * result + (int) (temp ^ (temp >>> 32));
             return result;
         }
     }
@@ -125,7 +163,14 @@ public class VehicleTypeImpl implements VehicleType {
         }
 
         private String id;
-        private double maxVelo = Double.MAX_VALUE;
+        /**
+         * 29.04.21 Ayman M. Maximum Velocity value changed to a logical value. 90km/h = 25 m/s
+         */
+        private double maxVelo = 25;// Double.MAX_VALUE;
+        /*
+        Setting average velocity to 50 km/h ~= 13 m/s
+         */
+        private double avgVelo = 13;
         /**
          * default cost values for default vehicle type
          */
@@ -134,8 +179,27 @@ public class VehicleTypeImpl implements VehicleType {
         private double perTime = 0.0;
         private double perWaitingTime = 0.0;
         private double perServiceTime = 0.0;
+        /**
+         * @author: Ayman M.
+         * Energy Specific cost parameters
+         */
+        private double perEnergyUnit_Battery = 0.0;
+        private double perEnergyUnit_Fuel = 0.0;
 
-        private String profile = "car";
+        /**
+         * @author Ayman M.
+         * Adding energy_type
+         * 1: Fuel - 2: Battery Electric - 3: Hybrid (TODO: add mode selection attribute)
+         */
+        private int energy_type = 1;
+
+        /**
+         * @author: profile is transformed into an object
+         *
+         */
+        private String profile_name = "car";
+
+        private VehicleProfile profile = VehicleProfile.newInstance(profile_name);
 
         private Capacity.Builder capacityBuilder = Capacity.Builder.newInstance();
 
@@ -190,6 +254,24 @@ public class VehicleTypeImpl implements VehicleType {
             if (inMeterPerSeconds < 0.0)
                 throw new IllegalArgumentException("The velocity of a vehicle (type) cannot be smaller than zero.");
             this.maxVelo = inMeterPerSeconds;
+            return this;
+        }
+
+        /**
+         * Sets the maximum velocity this vehicle-type can go [in meter per
+         * seconds].
+         *
+         * @author Ayman M.
+         *
+         * @param inMeterPerSeconds in m/s
+         * @return this builder
+         * @throws IllegalArgumentException
+         *             if velocity is smaller than zero
+         */
+        public VehicleTypeImpl.Builder setAverageVelocity(double inMeterPerSeconds) {
+            if (inMeterPerSeconds < 0.0)
+                throw new IllegalArgumentException("The velocity of a vehicle (type) cannot be smaller than zero.");
+            this.avgVelo = inMeterPerSeconds;
             return this;
         }
 
@@ -273,6 +355,38 @@ public class VehicleTypeImpl implements VehicleType {
 
         public VehicleTypeImpl.Builder setCostPerServiceTime(double perServiceTime) {
             this.perServiceTime = perServiceTime;
+            return this;
+        }
+
+        /**
+         * sets battery propulsion cost
+         * // TODO: add a cost parameter for recuperation cost
+         * <p>
+         * <p>by default it is 1.0
+         *
+         * @param perEnergyUnit_Battery cost per energy unit
+         * @return this builder
+         * @throws IllegalArgumentException if costPerTime is smaller than zero
+         */
+        public VehicleTypeImpl.Builder setCostPerEnergyUnit_Battery(double perEnergyUnit_Battery) {
+            if (perEnergyUnit_Battery < 0.0) throw new IllegalArgumentException();
+            this.perEnergyUnit_Battery = perEnergyUnit_Battery;
+            return this;
+        }
+
+        /**
+         * sets fuel propulsion cost
+         *
+         * <p>
+         * <p>by default it is 1.0
+         *
+         * @param perEnergyUnit_Fuel cost per energy unit
+         * @return this builder
+         * @throws IllegalArgumentException if costPerTime is smaller than zero
+         */
+        public VehicleTypeImpl.Builder setCostPerEnergyUnit_Fuel(double perEnergyUnit_Fuel) {
+            if (perEnergyUnit_Fuel < 0.0) throw new IllegalArgumentException();
+            this.perEnergyUnit_Fuel = perEnergyUnit_Fuel;
             return this;
         }
 
@@ -379,9 +493,24 @@ public class VehicleTypeImpl implements VehicleType {
             return this;
         }
 
+        /**
+         * @author Ayman M.
+         *
+         * Setting profile only requires the name, the user has no access to the parameters of the profile
+         * The profile name is then used to build an object that can be used to build an object (@link VehicleProfile)
+         * @param profile_name
+         * @return
+         */
 
-        public Builder setProfile(String profile) {
-            this.profile = profile;
+        public Builder setProfile(String profile_name) {
+            // TODO: Ensure that you don't need to instantiate the profile here
+            this.profile_name = profile_name;
+            return this;
+        }
+
+        public Builder setEnergyType(int energy_type) {
+            if (energy_type < 0 || energy_type > 3) throw new IllegalArgumentException("The energy type value must be one of the following: 1 (Fuel), 2 (Battery Electric), 3 (Hybrid)");
+            this.energy_type = energy_type;
             return this;
         }
     }
@@ -394,8 +523,9 @@ public class VehicleTypeImpl implements VehicleType {
         VehicleTypeImpl that = (VehicleTypeImpl) o;
 
         if (Double.compare(that.maxVelocity, maxVelocity) != 0) return false;
+        if (Double.compare(that.avgVelocity, avgVelocity) != 0) return false;
         if (!typeId.equals(that.typeId)) return false;
-        if (profile != null ? !profile.equals(that.profile) : that.profile != null) return false;
+        if (profile_name != null ? !profile_name.equals(that.profile_name) : that.profile_name != null) return false;
         if (!vehicleCostParams.equals(that.vehicleCostParams)) return false;
         /**
          * Ayman 09/02
@@ -409,22 +539,22 @@ public class VehicleTypeImpl implements VehicleType {
         int result;
         long temp;
         result = typeId.hashCode();
-        result = 31 * result + (profile != null ? profile.hashCode() : 0);
+        result = 31 * result + (profile_name != null ? profile_name.hashCode() : 0);
         result = 31 * result + vehicleCostParams.hashCode();
         result = 31 * result + capacityDimensions.hashCode();
-        /**
-         * Ayman 08/02
-         * look for the usage of this code
-         */
         result = 31 * result + BatteryDimensions.hashCode();
         temp = Double.doubleToLongBits(maxVelocity);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(avgVelocity);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
     private final String typeId;
 
-    private final String profile;
+    private final String profile_name;
+
+    private final VehicleProfile profile;
 
     private final VehicleTypeImpl.VehicleCostParams vehicleCostParams;
 
@@ -437,6 +567,9 @@ public class VehicleTypeImpl implements VehicleType {
     private final BatteryAM BatteryDimensions;
 
     private final double maxVelocity;
+    private final double avgVelocity;
+
+    private final int energy_type;
 
     private Object userData;
 
@@ -449,13 +582,16 @@ public class VehicleTypeImpl implements VehicleType {
         this.userData = builder.userData;
         typeId = builder.id;
         maxVelocity = builder.maxVelo;
+        avgVelocity = builder.avgVelo;
         vehicleCostParams = new VehicleCostParams(builder.fixedCost, builder.perTime, builder.perDistance, builder.perWaitingTime, builder.perServiceTime);
         capacityDimensions = builder.capacityDimensions;
         /**
          * Ayman 08/02
          */
         BatteryDimensions = builder.BatteryDimensions;
+        profile_name = builder.profile_name;
         profile = builder.profile;
+        energy_type = builder.energy_type;
     }
 
     /**
@@ -496,6 +632,11 @@ public class VehicleTypeImpl implements VehicleType {
     }
 
     @Override
+    public double getAverageVelocity() {
+        return avgVelocity;
+    }
+
+    @Override
     public Capacity getCapacityDimensions() {
         return capacityDimensions;
     }
@@ -512,8 +653,17 @@ public class VehicleTypeImpl implements VehicleType {
     }
 
     @Override
-    public String getProfile() {
+    public VehicleProfile getProfile() {
         return profile;
     }
 
+    @Override
+    public int getEnergyType() {
+        return energy_type;
+    }
+
+    public String getEnergyType_String() {
+        String[] energy_types = {"FUEL", "BATTERY ELECTRIC", "HYBRID"};
+        return energy_types[energy_type];
+    }
 }

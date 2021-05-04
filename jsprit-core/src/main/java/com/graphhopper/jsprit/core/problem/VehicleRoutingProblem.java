@@ -442,6 +442,7 @@ public class VehicleRoutingProblem {
          * Builds the {@link VehicleRoutingProblem}.
          * <p>
          * <p>If {@link VehicleRoutingTransportCosts} are not set, {@link CrowFlyCosts} is used.
+         * <p>If {@link VehicleRoutingEnergyCosts} are not set, {@link constantConsumptionCost} is used.
          *
          * @return {@link VehicleRoutingProblem}
          */

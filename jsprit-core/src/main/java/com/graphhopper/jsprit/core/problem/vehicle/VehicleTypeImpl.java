@@ -659,6 +659,8 @@ public class VehicleTypeImpl implements VehicleType {
 
     @Override
     public int getEnergyType() {
+        // getEnergyType().getCoefficient()
+        // TODO:
         return energy_type;
     }
 

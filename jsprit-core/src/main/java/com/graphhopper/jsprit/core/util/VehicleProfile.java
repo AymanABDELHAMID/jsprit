@@ -1,8 +1,16 @@
 package com.graphhopper.jsprit.core.util;
 
-import com.graphhopper.jsprit.core.problem.BatteryAM;
-import com.graphhopper.jsprit.core.problem.Capacity;
+import com.graphhopper.jsprit.core.problem.*;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingEnergyCosts;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
+import com.graphhopper.jsprit.core.problem.job.Job;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
+
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * @author Ayman M.
@@ -39,6 +47,8 @@ public class VehicleProfile {
         }
 
         private String profile_name;
+        private Set<String> addedProfileNames = new LinkedHashSet<>();
+
         /**
          * 29.04.21 Ayman M. Adding default profile values
          */
@@ -73,6 +83,39 @@ public class VehicleProfile {
             this.profile_name = profile_name;
             return this;
         }
+
+        /**
+         * Adds a vehicle.
+         *
+         * @param profile vehicle to be added
+         * @return this builder
+         */
+        public VehicleProfile.Builder addProfile(VehicleProfile profile) {
+            if(addedProfileNames.contains(profile.getName())){
+                throw new IllegalArgumentException("The vehicle Profile already has a similar profile for " + profile.getName() + ".");
+            }
+            else addedProfileNames.add(profile.getName());
+
+            return this;
+        }
+
+        /**
+         * builds vehicle profiles
+         */
+        public VehicleProfile build() {
+
+            return new VehicleProfile(profile_name);
+        }
+
+    }
+
+
+    private VehicleProfile(VehicleProfile.Builder builder) {
+       this.profile_name = builder.profile_name;
+    }
+
+    public String getName() {
+        return profile_name;
     }
 
     @Override

@@ -21,6 +21,12 @@
 <profile xmlns="http://www.w3schools.com"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.w3schools.com vehicleParameters_schema.xsd">
+    <!--
+    ~ another way of doing it is to create profile id's.
+    ~ it is believed that this method is better because it allows each child
+    ~ to have a
+    -->
+
     <car>
         <dimensions>
             <frontalArea>1.81</frontalArea>

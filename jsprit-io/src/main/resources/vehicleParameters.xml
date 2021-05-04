@@ -15,11 +15,71 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
+  ~ eXtensible Markup Language
   -->
 
 <profile xmlns="http://www.w3schools.com"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://www.w3schools.com vehicleParameters_schema.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.w3schools.com vehicleParameters_schema.xsd">
+    <car>
+        <dimensions>
+            <frontalArea>1.81</frontalArea>
+            <!-- https://cars.lovetoknow.com/List_of_Car_Weights -->
+            <weight>1324</weight> <!-- in kg --> <!-- TODO: Battery electric vehicle is heavier than ICEV-->
+        </dimensions>
+        <speed> <!-- in meter per second -->
+            <maximum>25</maximum>
+            <average>13</average>
+        </speed>
+        <crr></crr> <!-- Rolling friction coefficient -->
+        <cw></cw> <!-- air drag coefficient -->
 
-    
+    </car>
+
+    <bus>
+        <dimensions>
+            <frontalArea>1.81</frontalArea> <!-- in m^2 -->
+            <!-- https://cars.lovetoknow.com/List_of_Car_Weights -->
+            <weight>1324</weight> <!-- in kg --> <!-- TODO: Battery electric vehicle is heavier than ICEV-->
+        </dimensions>
+        <speed> <!-- in meter per second -->
+            <maximum>25</maximum>
+            <average>13</average>
+        </speed>
+        <crr></crr> <!-- Rolling friction coefficient -->
+        <cw></cw> <!-- air drag coefficient -->
+
+    </bus>
+
+    <truck>
+        <dimensions>
+            <frontalArea>1.81</frontalArea>
+            <!-- https://cars.lovetoknow.com/List_of_Car_Weights -->
+            <weight>1324</weight> <!-- in kg --> <!-- TODO: Battery electric vehicle is heavier than ICEV-->
+        </dimensions>
+        <speed> <!-- in meter per second -->
+            <maximum>25</maximum>
+            <average>13</average>
+        </speed>
+        <crr></crr> <!-- Rolling friction coefficient -->
+        <cw></cw> <!-- air drag coefficient -->
+
+    </truck>
+
+    <bigTruck>
+        <dimensions>
+            <frontalArea>1.81</frontalArea>
+            <!-- https://cars.lovetoknow.com/List_of_Car_Weights -->
+            <weight>1324</weight> <!-- in kg --> <!-- TODO: Battery electric vehicle is heavier than ICEV-->
+        </dimensions>
+        <speed> <!-- in meter per second -->
+            <maximum>25</maximum>
+            <average>13</average>
+        </speed>
+        <crr></crr> <!-- Rolling friction coefficient -->
+        <cw></cw> <!-- air drag coefficient -->
+
+    </bigTruck>
+
 </profile>
+

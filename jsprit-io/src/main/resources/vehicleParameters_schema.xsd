@@ -17,16 +17,181 @@
   ~ limitations under the License.
   -->
 
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.w3schools.com"
-           xmlns="http://www.w3schools.com" elementFormDefault="qualified">
 
-    <xs:element name="profile">
-
-    </xs:element>
-
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://www.w3schools.com">
+<xs:element name="profile">
+    <xs:complexType>
+        <xs:sequence>
+            <xs:element name="car">
+                <xs:annotation>
+                    <xs:documentation>air drag coefficient</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="dimensions">
+                            <xs:annotation>
+                                <xs:documentation>in kg  TODO: Battery electric vehicle is heavier than ICEV</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element type="xs:float" name="frontalArea"/> <!-- TODO: make sure it is double -->
+                                    <xs:element type="xs:short" name="weight">
+                                        <xs:annotation>
+                                            <xs:documentation>https://cars.lovetoknow.com/List_of_Car_Weights</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="speed">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element type="xs:byte" name="maximum">
+                                        <xs:annotation>
+                                            <xs:documentation>in meter per second</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element type="xs:byte" name="average"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element type="xs:string" name="crr"/>
+                        <xs:element type="xs:string" name="cw">
+                            <xs:annotation>
+                                <xs:documentation>Rolling friction coefficient</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="bus">
+                <xs:annotation>
+                    <xs:documentation>air drag coefficient</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="dimensions">
+                            <xs:annotation>
+                                <xs:documentation>in kg  TODO: Battery electric vehicle is heavier than ICEV</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element type="xs:float" name="frontalArea"/>
+                                    <xs:element type="xs:short" name="weight">
+                                        <xs:annotation>
+                                            <xs:documentation>https://cars.lovetoknow.com/List_of_Car_Weights</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="speed">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element type="xs:byte" name="maximum">
+                                        <xs:annotation>
+                                            <xs:documentation>in meter per second</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element type="xs:byte" name="average"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element type="xs:string" name="crr"/>
+                        <xs:element type="xs:string" name="cw">
+                            <xs:annotation>
+                                <xs:documentation>Rolling friction coefficient</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="truck">
+                <xs:annotation>
+                    <xs:documentation>air drag coefficient</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="dimensions">
+                            <xs:annotation>
+                                <xs:documentation>in kg  TODO: Battery electric vehicle is heavier than ICEV</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element type="xs:float" name="frontalArea"/>
+                                    <xs:element type="xs:short" name="weight">
+                                        <xs:annotation>
+                                            <xs:documentation>https://cars.lovetoknow.com/List_of_Car_Weights</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="speed">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element type="xs:byte" name="maximum">
+                                        <xs:annotation>
+                                            <xs:documentation>in meter per second</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element type="xs:byte" name="average"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element type="xs:string" name="crr"/>
+                        <xs:element type="xs:string" name="cw">
+                            <xs:annotation>
+                                <xs:documentation>Rolling friction coefficient</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="bigTruck">
+                <xs:annotation>
+                    <xs:documentation>air drag coefficient</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="dimensions">
+                            <xs:annotation>
+                                <xs:documentation>in kg  TODO: Battery electric vehicle is heavier than ICEV</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element type="xs:float" name="frontalArea"/>
+                                    <xs:element type="xs:short" name="weight">
+                                        <xs:annotation>
+                                            <xs:documentation>https://cars.lovetoknow.com/List_of_Car_Weights</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="speed">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element type="xs:byte" name="maximum">
+                                        <xs:annotation>
+                                            <xs:documentation>in meter per second</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element type="xs:byte" name="average"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element type="xs:string" name="crr"/>
+                        <xs:element type="xs:string" name="cw">
+                            <xs:annotation>
+                                <xs:documentation>Rolling friction coefficient</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+</xs:element>
 </xs:schema>
-
-<!-- <xs:element name="orderperson" type="xs:string"/>
-~ https://www.w3schools.com/xml/schema_example.asp
--->
-

@@ -93,6 +93,13 @@ public class VehicleParameterReader {
                 // or I can replace it with a default value using the builder
             }
             builder.setFrontalArea(Double.parseDouble(frontalArea));
+
+            //build vehicle
+            VehicleProfile profile = builder.build();
+            builder.addProfile(profile); // TODO: This is problematic, I think it is better to og back to the original design,
+                                        // TODO: add vehicle parameters class, then add vehicleprofile that has a list of vehicleprofiles
+                                        // TODO: or transform vehicleProfile into VehcileProfiles with an internal class: VehicleProfile
+            // you can also put a map
         }
     }
 

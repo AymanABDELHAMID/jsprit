@@ -9,9 +9,7 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import org.apache.commons.configuration.XMLConfiguration;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Ayman M.
@@ -65,6 +63,7 @@ public class VehicleProfile {
 
         private String profile_name;
         private Set<String> addedProfileNames = new LinkedHashSet<>();
+        private List<VehicleProfile> vehicleProfiles = new ArrayList<>();
 
         /**
          * 29.04.21 Ayman M. Adding default profile values
@@ -107,11 +106,12 @@ public class VehicleProfile {
          * @param profile vehicle to be added
          * @return this builder
          */
-        public VehicleProfile.Builder addProfile(VehicleProfile profile) {
+        public Builder addProfile(VehicleProfile profile) {
             if(addedProfileNames.contains(profile.getName())){
                 throw new IllegalArgumentException("The vehicle Profile already has a similar profile for " + profile.getName() + ".");
             }
             else addedProfileNames.add(profile.getName());
+            vehicleProfiles.add(profile);
 
             return this;
         }

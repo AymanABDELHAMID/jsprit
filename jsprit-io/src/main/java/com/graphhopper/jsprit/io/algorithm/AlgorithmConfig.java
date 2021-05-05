@@ -19,6 +19,7 @@ package com.graphhopper.jsprit.io.algorithm;
 
 import org.apache.commons.configuration.XMLConfiguration;
 
+
 public class AlgorithmConfig {
 
     private XMLConfiguration xmlConfig;

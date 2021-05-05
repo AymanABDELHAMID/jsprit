@@ -26,7 +26,7 @@
     ~ it is believed that this method is better because it allows each child
     ~ to have a
     -->
-    <!-- TODO: change to Profiles.Profile.id = car -->
+
     <car>
         <dimensions>
             <frontalArea>1.81</frontalArea>

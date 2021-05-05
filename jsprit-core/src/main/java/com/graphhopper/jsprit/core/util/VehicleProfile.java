@@ -7,6 +7,7 @@ import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
+import org.apache.commons.configuration.XMLConfiguration;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -32,6 +33,22 @@ public class VehicleProfile {
     private VehicleProfile(String profile_name) {
         super();
         this.profile_name = profile_name;
+    }
+
+    /**
+     * Vehicle profile XML configuration
+     */
+    public class VehicleProfileConfig {
+
+        private XMLConfiguration xmlConfig;
+
+        public VehicleProfileConfig() {
+            xmlConfig = new XMLConfiguration();
+        }
+
+        public XMLConfiguration getXMLConfiguration() {
+            return xmlConfig;
+        }
     }
 
     /**
@@ -108,6 +125,8 @@ public class VehicleProfile {
         }
 
     }
+
+    private final Set<String> addedProfileNames = new LinkedHashSet<>();
 
 
     private VehicleProfile(VehicleProfile.Builder builder) {

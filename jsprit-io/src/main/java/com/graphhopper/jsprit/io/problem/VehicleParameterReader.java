@@ -94,6 +94,8 @@ public class VehicleParameterReader {
             }
             builder.setFrontalArea(Double.parseDouble(frontalArea));
 
+            // TODO: instantiate VehicleProfiles
+
             //build vehicle
             VehicleProfile profile = builder.build();
             builder.addProfile(profile); // TODO: This is problematic, I think it is better to og back to the original design,

@@ -24,7 +24,6 @@ public class VehicleProfile {
     The profile name should be one of the profiles recognized, if not, the vehicle profile is set to default values of a car profile
     To add your own profile, just add a file containing the profile data in the IO
      */
-
     private final String profile_name;
 
 

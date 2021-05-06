@@ -15,10 +15,10 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  ~ eXtensible Markup Language
+  ~ extensible Markup Language
   -->
 
-<profile xmlns="http://www.w3schools.com"
+<profiles xmlns="http://www.w3schools.com"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.w3schools.com vehicleParameters_schema.xsd">
     <!--
@@ -26,66 +26,98 @@
     ~ it is believed that this method is better because it allows each child
     ~ to have a
     -->
-    <!-- TODO: change to Profiles.Profile.id = car -->
-    <car>
+    <profile>
+        <id>car_icev</id>
         <dimensions>
             <frontalArea>1.81</frontalArea>
             <!-- https://cars.lovetoknow.com/List_of_Car_Weights -->
-            <weight>1324</weight> <!-- in kg --> <!-- TODO: Battery electric vehicle is heavier than ICEV-->
+            <weight>1324</weight> <!-- in kg -->
         </dimensions>
         <speed> <!-- in meter per second -->
             <maximum>25</maximum>
             <average>13</average>
         </speed>
-        <crr></crr> <!-- Rolling friction coefficient -->
-        <cw></cw> <!-- air drag coefficient -->
+        <crr>0.0105</crr> <!-- Rolling friction coefficient -->
+        <cw>0.33</cw> <!-- air drag coefficient -->
+        <nm>0.8</nm> <!-- efficiency of driving -->
+        <ng>1000000</ng> <!-- efficiency of recuperating -->
 
-    </car>
+    </profile>
 
-    <bus>
-        <dimensions>
-            <frontalArea>1.81</frontalArea> <!-- in m^2 -->
-            <!-- https://cars.lovetoknow.com/List_of_Car_Weights -->
-            <weight>1324</weight> <!-- in kg --> <!-- TODO: Battery electric vehicle is heavier than ICEV-->
-        </dimensions>
-        <speed> <!-- in meter per second -->
-            <maximum>25</maximum>
-            <average>13</average>
-        </speed>
-        <crr></crr> <!-- Rolling friction coefficient -->
-        <cw></cw> <!-- air drag coefficient -->
-
-    </bus>
-
-    <truck>
+    <profile>
+        <id>car_be</id>
         <dimensions>
             <frontalArea>1.81</frontalArea>
             <!-- https://cars.lovetoknow.com/List_of_Car_Weights -->
-            <weight>1324</weight> <!-- in kg --> <!-- TODO: Battery electric vehicle is heavier than ICEV-->
+            <weight>1405</weight> <!-- in kg (vehicle curb weight + driver weight (80kg)) -->
+            <!-- TODO: Battery electric vehicle is heavier than ICEV-->
         </dimensions>
         <speed> <!-- in meter per second -->
             <maximum>25</maximum>
             <average>13</average>
         </speed>
-        <crr></crr> <!-- Rolling friction coefficient -->
-        <cw></cw> <!-- air drag coefficient -->
+        <crr>0.0105</crr> <!-- Rolling friction coefficient -->
+        <cw>0.33</cw> <!-- air drag coefficient -->
+        <nm>0.85</nm> <!-- efficiency of driving -->
+        <ng>0.64</ng> <!-- efficiency of recuperating -->
 
-    </truck>
+    </profile>
 
-    <bigTruck>
+    <profile>
+        <!-- https://www.dimensions.com/collection/buses -->
+        <id>bus</id>
         <dimensions>
-            <frontalArea>1.81</frontalArea>
+            <frontalArea>7.6245</frontalArea> <!-- in m^2 -->
             <!-- https://cars.lovetoknow.com/List_of_Car_Weights -->
-            <weight>1324</weight> <!-- in kg --> <!-- TODO: Battery electric vehicle is heavier than ICEV-->
+            <weight>1324</weight> <!-- in kg -->
         </dimensions>
         <speed> <!-- in meter per second -->
             <maximum>25</maximum>
             <average>13</average>
         </speed>
-        <crr></crr> <!-- Rolling friction coefficient -->
-        <cw></cw> <!-- air drag coefficient -->
+        <crr>0.014</crr> <!-- Rolling friction coefficient -->
+        <cw>0.4</cw> <!-- air drag coefficient -->
+        <nm>0.7</nm> <!-- efficiency of driving -->
+        <ng>1000000</ng> <!-- efficiency of recuperating -->
 
-    </bigTruck>
+    </profile>
 
-</profile>
+    <profile>
+        <!-- https://www.dimensions.com/element/ford-f-100-1976-truck -->
+        <id>truck</id>
+        <dimensions>
+            <frontalArea>3.51</frontalArea>
+            <!-- https://cars.lovetoknow.com/List_of_Car_Weights -->
+            <weight>1997</weight> <!-- in kg -->
+        </dimensions>
+        <speed> <!-- in meter per second -->
+            <maximum>25</maximum>
+            <average>13</average>
+        </speed>
+        <crr>0.014</crr> <!-- Rolling friction coefficient -->
+        <cw>0.35</cw> <!-- air drag coefficient -->
+        <nm>0.7</nm> <!-- efficiency of driving -->
+        <ng>1000000</ng> <!-- efficiency of recuperating -->
+
+    </profile>
+
+    <profile>
+        <id>bigTruck</id>
+        <dimensions>
+            <frontalArea>5.1816</frontalArea>
+            <!-- https://cars.lovetoknow.com/List_of_Car_Weights -->
+            <weight>2541</weight> <!-- in kg -->
+        </dimensions>
+        <speed> <!-- in meter per second -->
+            <maximum>25</maximum>
+            <average>13</average>
+        </speed>
+        <crr>0.014</crr> <!-- Rolling friction coefficient -->
+        <cw>0.4</cw> <!-- air drag coefficient -->
+        <nm>0.63</nm> <!-- efficiency of driving -->
+        <ng>1000000</ng> <!-- efficiency of recuperating -->
+
+    </profile>
+
+</profiles>
 

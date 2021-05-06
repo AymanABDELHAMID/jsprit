@@ -1,6 +1,7 @@
 package com.graphhopper.jsprit.core.util;
 
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -57,5 +58,36 @@ public class VehicleProfiles {
 
     public VehicleProfiles(Set<VehicleProfile> vehicleProfiles) {
         this.vehicleProfiles = vehicleProfiles;
+    }
+
+    public Set<VehicleProfile> getVehicleProfiles() {
+        return vehicleProfiles;
+    }
+
+    public Set<String> getAddedVehicleProfilesNames() {
+        return addedVehicleProfilesNames;
+    }
+
+    @Override
+    public String toString() {
+        return "VehicleProfiles{" +
+            "vehicleProfiles=" + vehicleProfiles +
+            ", addedVehicleProfilesNames=" + addedVehicleProfilesNames +
+            '}';
+    }
+
+    // TODO: use same equals and hashCode approaches used by Schroder
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof VehicleProfiles)) return false;
+        VehicleProfiles that = (VehicleProfiles) o;
+        return getVehicleProfiles().equals(that.getVehicleProfiles()) &&
+            getAddedVehicleProfilesNames().equals(that.getAddedVehicleProfilesNames());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getVehicleProfiles(), getAddedVehicleProfilesNames());
     }
 }

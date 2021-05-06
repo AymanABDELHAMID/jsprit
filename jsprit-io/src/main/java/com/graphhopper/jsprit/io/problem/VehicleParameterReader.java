@@ -11,6 +11,7 @@ import com.graphhopper.jsprit.core.util.VehicleProfile;
 /**
  * XML Specific imports
  */
+import com.graphhopper.jsprit.core.util.VehicleProfiles;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -78,37 +79,81 @@ public class VehicleParameterReader {
         //read vehicle profiles
         // TODO: each profile must have an ID to link it with the vehicle, such as vehicle is linked to vehicleType with ID
         List<HierarchicalConfiguration> vehicleProfileConfigs = vehicleProfile.configurationsAt("profile");
+        // instantiate VehicleProfiles
+        VehicleProfiles profiles = VehicleProfiles.Builder.newInstance().build();
         for (HierarchicalConfiguration vehicleProfileConfig : vehicleProfileConfigs) {
             String profileId = vehicleProfileConfig.getString("id");
             if (profileId == null) throw new IllegalArgumentException("profileId is missing.");
-            //VehicleImpl.Builder builder = VehicleImpl.Builder.newInstance(vehicleId);
             VehicleProfile.Builder builder = VehicleProfile.Builder.newInstance(profileId); // profileID = profile_name
-            //String profileType = vehicleProfileConfig.getString("[@type]");
 
             //read Frontal Area
             String frontalArea = vehicleProfileConfig.getString("dimensions.frontalArea");
             if (frontalArea == null) {
-                //locationId = vehicleConfig.getString("startLocation.id"); // TODO: understand what this means
                 throw new IllegalArgumentException("frontalArea is missing.");
-                // or I can replace it with a default value using the builder
             }
             builder.setFrontalArea(Double.parseDouble(frontalArea));
 
-            // TODO: instantiate VehicleProfiles
+            //read vehicle curb mass
+            String weight = vehicleProfileConfig.getString("dimensions.weight");
+            if (weight == null) {
+                throw new IllegalArgumentException("Vehicle weight is missing.");
+            }
+            builder.setVehicleWeight(Double.parseDouble(weight));
 
-            //build vehicle
+            //read vehicle maximum speed
+            String speed = vehicleProfileConfig.getString("speed.maximum");
+            if (speed == null) {
+                throw new IllegalArgumentException("Vehicle max. speed is missing.");
+            }
+            builder.setVehicleMaxSpeed(Double.parseDouble(speed));
+
+            //read vehicle average speed
+            String avgSpeed = vehicleProfileConfig.getString("speed.average");
+            if (avgSpeed == null) {
+                throw new IllegalArgumentException("Vehicle average speed is missing.");
+            }
+            builder.setVehicleAvgSpeed(Double.parseDouble(avgSpeed));
+
+            //read vehicle rolling resistance coefficient
+            String crr = vehicleProfileConfig.getString("crr");
+            if (crr == null) {
+                throw new IllegalArgumentException("Vehicle rolling resistance coefficient is missing.");
+            }
+            builder.setVehicleCRR(Double.parseDouble(crr));
+
+            //read vehicle air drag coefficient
+            String cw = vehicleProfileConfig.getString("cw");
+            if (cw == null) {
+                throw new IllegalArgumentException("Vehicle air drag coefficient is missing.");
+            }
+            builder.setVehicleCW(Double.parseDouble(cw));
+
+            //read vehicle mechanical efficiency
+            String nm = vehicleProfileConfig.getString("nm");
+            if (nm == null) {
+                throw new IllegalArgumentException("Vehicle mechanical efficiency is missing.");
+            }
+            builder.setVehicleNM(Double.parseDouble(crr));
+
+            //read vehicle gain efficiency
+            String ng = vehicleProfileConfig.getString("ng");
+            if (ng == null) {
+                throw new IllegalArgumentException("Vehicle gain efficiency is missing.");
+            }
+            builder.setVehicleNG(Double.parseDouble(crr));
+
+            // Build vehicle profile
             VehicleProfile profile = builder.build();
-            builder.addProfile(profile); // TODO: This is problematic, I think it is better to og back to the original design,
-                                        // TODO: add vehicle parameters class, then add vehicleprofile that has a list of vehicleprofiles
-                                        // TODO: or transform vehicleProfile into VehcileProfiles with an internal class: VehicleProfile
+
             // you can also put a map
+            profiles.addProfile(profile);
         }
     }
 
     public void read(String filename) {
         log.debug("read vehicle parameters from file " + filename);
         URL url = Resource.getAsURL(filename);
-        readVehicleParameters(this.vehicleProfileConfig.getXMLConfiguration()); // not sure this is correct
+        readVehicleParameters(this.vehicleProfileConfig.getXMLConfiguration());
         read(url);
     }
 }

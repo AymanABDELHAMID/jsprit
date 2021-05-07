@@ -199,7 +199,7 @@ public class VehicleTypeImpl implements VehicleType {
          */
         private String profile_name = "car";
 
-        private VehicleProfile profile = VehicleProfile.newInstance(profile_name); // TODO: fix the error
+        private VehicleProfile profile = VehicleProfile.Builder.newInstance(profile_name).build(); //VehicleProfile.newInstance(profile_name); // TODO: fix the error
 
         private Capacity.Builder capacityBuilder = Capacity.Builder.newInstance();
 

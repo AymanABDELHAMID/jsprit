@@ -48,7 +48,7 @@ public class VehicleProfile {
     /**
      * Vehicle profile XML configuration
      */
-    public class VehicleProfileConfig {
+    public static class VehicleProfileConfig {
 
         private XMLConfiguration xmlConfig;
 

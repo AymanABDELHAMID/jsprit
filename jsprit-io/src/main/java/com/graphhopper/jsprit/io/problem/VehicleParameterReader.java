@@ -32,10 +32,12 @@ public class VehicleParameterReader {
 
     private static Logger log = LoggerFactory.getLogger(VehicleParameterReader.class.getName());
     private VehicleProfile.VehicleProfileConfig vehicleProfileConfig;
+    private VehicleProfiles.Builder vehicleProfilesBuilder;
+    private boolean schemaValidation = true;
 
     // A Factory class to allow us create a profile builder object
     public interface VehicleProfileBuilderFactory {
-        VehicleProfile.Builder createBuilder(String profileName); // TODO: test with vehicle parameters
+        VehicleProfile.Builder createBuilder(String profileName);
     }
     static class DefaultVehicleProfileBuilderFactory implements VehicleParameterReader.VehicleProfileBuilderFactory {
 
@@ -46,11 +48,65 @@ public class VehicleParameterReader {
         }
     }
 
-    public VehicleParameterReader(VehicleProfile.VehicleProfileConfig vehicleProfileConfig) {
+    public VehicleParameterReader(VehicleProfile.VehicleProfileConfig vehicleProfileConfig, VehicleProfiles.Builder vehicleProfilesBuilder) {
         this.vehicleProfileConfig = vehicleProfileConfig;
+        this.vehicleProfilesBuilder = vehicleProfilesBuilder;
     }
 
+    //public VehicleParameterReader(VehicleProfiles.Builder vehicleProfilesBuilder) {
+        //this.vehicleProfileConfig = null;
+    //    this.vehicleProfilesBuilder = vehicleProfilesBuilder;
+    //}
 
+    public void read(InputStream fileContents) {
+        XMLConfiguration xmlConfig = createXMLConfiguration();
+        try {
+            xmlConfig.load(fileContents);
+        } catch (ConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+        read(xmlConfig);
+    }
+
+    public void read(String filename) {
+        log.debug("read vehicle profiles: {}", filename);
+        XMLConfiguration xmlConfig = createXMLConfiguration();
+        try {
+            xmlConfig.load(filename);
+        } catch (ConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+        read(xmlConfig);
+    }
+
+    private XMLConfiguration createXMLConfiguration() {
+        XMLConfiguration xmlConfig = new XMLConfiguration();
+        xmlConfig.setAttributeSplittingDisabled(true);
+        xmlConfig.setDelimiterParsingDisabled(true);
+
+        if (schemaValidation) {
+            final InputStream resource = Resource.getAsInputStream("vrp_xml_schema.xsd");
+            if (resource != null) {
+                EntityResolver resolver = new EntityResolver() {
+
+                    @Override
+                    public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+                        {
+                            InputSource is = new InputSource(resource);
+                            return is;
+                        }
+                    }
+                };
+                xmlConfig.setEntityResolver(resolver);
+                xmlConfig.setSchemaValidation(true);
+            } else {
+                log.debug("cannot find schema-xsd file (vehicleParameters_schema.xsd).");
+            }
+        }
+        return xmlConfig;
+    }
+
+    /*
     public void read(URL url) {
         log.debug("read vehicle parameters: " + url);
         vehicleProfileConfig.getXMLConfiguration().setURL(url);
@@ -73,6 +129,12 @@ public class VehicleParameterReader {
         } else {
             log.warn("cannot find schema-xsd file (vehicleParameters_schema.xsd).");
         }
+    }*/
+
+    private void read(XMLConfiguration xmlConfig) {
+        readVehicleParameters(xmlConfig);
+        //addJobsAndTheirLocationsToVrp();
+        // TODO : add more functions
     }
 
     public void readVehicleParameters(XMLConfiguration vehicleProfile) {
@@ -150,10 +212,13 @@ public class VehicleParameterReader {
         }
     }
 
+    /*
     public void read(String filename) {
         log.debug("read vehicle parameters from file " + filename);
         URL url = Resource.getAsURL(filename);
         readVehicleParameters(this.vehicleProfileConfig.getXMLConfiguration());
         read(url);
     }
+    */
+
 }

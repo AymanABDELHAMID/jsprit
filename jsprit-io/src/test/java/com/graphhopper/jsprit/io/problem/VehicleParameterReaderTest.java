@@ -36,12 +36,34 @@ public class VehicleParameterReaderTest {
     @Test
     public void shouldReadVehicleProfileIDs() {
         VehicleProfiles.Builder builder = VehicleProfiles.Builder.newInstance();
-        VehicleProfile.VehicleProfileConfig vehicleProfileConfig = new VehicleProfile.VehicleProfileConfig();
-        new VehicleParameterReader(vehicleProfileConfig, builder).read(inputStream);
+       // VehicleProfile.VehicleProfileConfig vehicleProfileConfig = new VehicleProfile.VehicleProfileConfig();
+        new VehicleParameterReader(builder).read(inputStream);
         VehicleProfiles vehicleProfiles = builder.build();
         Set<String> profileNames = vehicleProfiles.getAddedVehicleProfilesNames();
-        String carIcev = "car_icev";
-        //boolean verifier = profileNames.contains(car_icev);
+        String carIcev = "bigTruck";
         assertTrue(profileNames.contains(carIcev));
     }
+
+    @Test
+    public void shouldReadVehicleProfileMaxSpeed() {
+        VehicleProfiles.Builder builder = VehicleProfiles.Builder.newInstance();
+        // VehicleProfile.VehicleProfileConfig vehicleProfileConfig = new VehicleProfile.VehicleProfileConfig();
+        new VehicleParameterReader(builder).read(inputStream);
+        VehicleProfiles vehicleProfiles = builder.build();
+        List<VehicleProfile> profiles = vehicleProfiles.getVehicleProfiles();
+        assertTrue(profiles.get(1).getMaxSpeed()==25);
+    }
+
+    @Test
+    public void shouldReadVehicleProfileFrontalArea() {
+        VehicleProfiles.Builder builder = VehicleProfiles.Builder.newInstance();
+        // VehicleProfile.VehicleProfileConfig vehicleProfileConfig = new VehicleProfile.VehicleProfileConfig();
+        new VehicleParameterReader(builder).read(inputStream);
+        VehicleProfiles vehicleProfiles = builder.build();
+        Set<String> profileNames = vehicleProfiles.getAddedVehicleProfilesNames();
+        List<VehicleProfile> profiles = vehicleProfiles.getVehicleProfiles();
+        assertTrue(profiles.get(1).getFrontalArea()==1.81);
+    }
+
+    // These random tests + me checking visually that it is working ensure the correct functionality of the reader.
 }

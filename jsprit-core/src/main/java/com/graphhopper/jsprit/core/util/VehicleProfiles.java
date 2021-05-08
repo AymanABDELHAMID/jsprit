@@ -1,8 +1,8 @@
 package com.graphhopper.jsprit.core.util;
 
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+
+import java.util.*;
 
 /**
  * @author Ayman M.
@@ -17,8 +17,15 @@ public class VehicleProfiles {
      * Searching entire ArrayList every time you need to insert something will be performance killer.
      * Using Linkedhashset instead.
      */
-    //private List<VehicleProfile> vehicleProfiles = new ArrayList<>();
-    private Set<VehicleProfile> vehicleProfiles = new LinkedHashSet<>();
+    private List<VehicleProfile> vehicleProfiles = new ArrayList<>();
+    /*
+    As far as I understood, the following error;
+    java.lang.NumberFormatException: For input string: "carIcev"
+    is maybe because there are repeated characters, I am not sure.
+    https://stackoverflow.com/questions/32503555/iterating-through-linkedhashset-with-switch-case-cause-a-matching-parameter-to-g
+    I will try again but with using a List instead of a Set.
+     */
+    //private Set<VehicleProfile> vehicleProfiles = new LinkedHashSet<>();
 
     private Set<String> addedVehicleProfilesNames = new LinkedHashSet<>();
     // TODO: add default parameter maybe with a build factory
@@ -29,22 +36,24 @@ public class VehicleProfiles {
             return new VehicleProfiles.Builder();
         }
 
-        private Set<VehicleProfile> vehicleProfiles = new LinkedHashSet<>();
+        private List<VehicleProfile> vehicleProfiles = new ArrayList<>();
 
         private Set<String> addedVehicleProfilesNames = new LinkedHashSet<>();
 
-        public void addProfile(VehicleProfile profile){
+        public Builder addProfile(VehicleProfile profile){
             if(addedVehicleProfilesNames.contains(profile.getName())){
                 throw new IllegalArgumentException("The vehicle Profile already has a similar profile for " + profile.getName() + ".");
             }
+            else addedVehicleProfilesNames.add(profile.getName());
             vehicleProfiles.add(profile);
+            return this;
         }
 
         /**
          * builds vehicle profiles
          */
         public VehicleProfiles build() {
-            return new VehicleProfiles(vehicleProfiles);
+            return new VehicleProfiles(vehicleProfiles, addedVehicleProfilesNames);
         }
 
     }
@@ -53,14 +62,16 @@ public class VehicleProfiles {
         if(addedVehicleProfilesNames.contains(profile.getName())){
             throw new IllegalArgumentException("The vehicle Profile already has a similar profile for " + profile.getName() + ".");
         }
+        else addedVehicleProfilesNames.add(profile.getName());
         vehicleProfiles.add(profile);
     }
 
-    public VehicleProfiles(Set<VehicleProfile> vehicleProfiles) {
+    public VehicleProfiles(List<VehicleProfile> vehicleProfiles,  Set<String> addedVehicleProfilesNames) {
         this.vehicleProfiles = vehicleProfiles;
+        this.addedVehicleProfilesNames = addedVehicleProfilesNames;
     }
 
-    public Set<VehicleProfile> getVehicleProfiles() {
+    public List<VehicleProfile> getVehicleProfiles() {
         return vehicleProfiles;
     }
 

@@ -27,7 +27,7 @@
     ~ to have a
     -->
     <profile>
-        <id>car_icev</id>
+        <id>carIcev</id> <!-- java.lang.NumberFormatException: For input string: "car_icev" the underscore is not allowed !!!-->
         <dimensions>
             <frontalArea>1.81</frontalArea>
             <!-- https://cars.lovetoknow.com/List_of_Car_Weights -->
@@ -45,7 +45,7 @@
     </profile>
 
     <profile>
-        <id>car_be</id>
+        <id>car-be</id>
         <dimensions>
             <frontalArea>1.81</frontalArea>
             <!-- https://cars.lovetoknow.com/List_of_Car_Weights -->

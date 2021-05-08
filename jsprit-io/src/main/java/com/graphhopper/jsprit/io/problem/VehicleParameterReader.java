@@ -31,7 +31,7 @@ import java.util.*;
 public class VehicleParameterReader {
 
     private static Logger log = LoggerFactory.getLogger(VehicleParameterReader.class.getName());
-    private VehicleProfile.VehicleProfileConfig vehicleProfileConfig;
+    //private VehicleProfile.VehicleProfileConfig vehicleProfileConfig;
     private VehicleProfiles.Builder vehicleProfilesBuilder;
     private boolean schemaValidation = true;
 
@@ -48,8 +48,8 @@ public class VehicleParameterReader {
         }
     }
 
-    public VehicleParameterReader(VehicleProfile.VehicleProfileConfig vehicleProfileConfig, VehicleProfiles.Builder vehicleProfilesBuilder) {
-        this.vehicleProfileConfig = vehicleProfileConfig;
+    public VehicleParameterReader(VehicleProfiles.Builder vehicleProfilesBuilder) {
+        //this.vehicleProfileConfig = vehicleProfileConfig;
         this.vehicleProfilesBuilder = vehicleProfilesBuilder;
     }
 
@@ -85,7 +85,7 @@ public class VehicleParameterReader {
         xmlConfig.setDelimiterParsingDisabled(true);
 
         if (schemaValidation) {
-            final InputStream resource = Resource.getAsInputStream("vrp_xml_schema.xsd");
+            final InputStream resource = Resource.getAsInputStream("vehicleParameters_schema.xsd");
             if (resource != null) {
                 EntityResolver resolver = new EntityResolver() {
 
@@ -142,7 +142,7 @@ public class VehicleParameterReader {
         // TODO: each profile must have an ID to link it with the vehicle, such as vehicle is linked to vehicleType with ID
         List<HierarchicalConfiguration> vehicleProfileConfigs = vehicleProfile.configurationsAt("profile");
         // instantiate VehicleProfiles
-        VehicleProfiles profiles = VehicleProfiles.Builder.newInstance().build();
+        // VehicleProfiles profiles = VehicleProfiles.Builder.newInstance().build(); // This is wrong
         for (HierarchicalConfiguration vehicleProfileConfig : vehicleProfileConfigs) {
             String profileId = vehicleProfileConfig.getString("id");
             if (profileId == null) throw new IllegalArgumentException("profileId is missing.");
@@ -208,7 +208,8 @@ public class VehicleParameterReader {
             VehicleProfile profile = builder.build();
 
             // you can also put a map
-            profiles.addProfile(profile);
+            //profiles.addProfile(profile);
+            this.vehicleProfilesBuilder.addProfile(profile);
         }
     }
 

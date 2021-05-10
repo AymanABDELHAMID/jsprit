@@ -39,12 +39,12 @@ public class VehicleRoutingEnergyCostMatrix extends AbstractForwardVehicleEnergy
          * @see java.lang.Object#hashCode()
          */
         @Override
-        public int hashCode() { //Proposition TC
-            String result = ""; //"";
-            result = result + ((from == null) ? "0" : from);
-            result += "-";
-            result = result + ((to == null) ? "0" : to);
-            return Integer.parseInt(result);
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((from == null) ? 0 : from.hashCode());
+            result = prime * result + ((to == null) ? 0 : to.hashCode());
+            return result;
         }
 
         /* (non-Javadoc)
@@ -58,7 +58,7 @@ public class VehicleRoutingEnergyCostMatrix extends AbstractForwardVehicleEnergy
                 return false;
             if (getClass() != obj.getClass())
                 return false;
-            VehicleRoutingEnergyCostMatrix.RelationKey other = (VehicleRoutingEnergyCostMatrix.RelationKey) obj;
+            RelationKey other = (RelationKey) obj;
             if (from == null) {
                 if (other.from != null)
                     return false;

@@ -14,16 +14,35 @@ public class EnergyConsumptionCalculator {
      * @return energy consumption needed
      */
     public static double calculateConsumption(Coordinate coord1, Coordinate coord2, VehicleType type, Double load) {
-        // Construct vehicle instance
-        // I think you can use calculatedistance directly
-        //Vehicle v = new Vehicle(type)
-        double xDiff = coord1.getX() - coord2.getX();
-        double yDiff = coord1.getY() - coord2.getY();
-        return Math.sqrt((xDiff * xDiff) + (yDiff * yDiff));
+        double mass = type.getProfile().getWeight() + load;
+        double slope = 0; // TODO: road grade is considered flat for now
+        double g = 9.81;
+        double rho = 1.055;
+        double grade = mass*g*Math.sin(slope);
+        double rolling = mass*g*Math.cos(slope)*type.getProfile().getCrr();
+        double air = 0.5*rho*type.getProfile().getCw()*type.getProfile().getFrontalArea()*Math.pow(type.getProfile().getAvgSpeed(), 2.);
+        double Fr = grade + rolling + air;
+        // acceleration is considered to be null
+        double d = EuclideanDistanceCalculator.calculateDistance(coord1, coord2);
+        double travelTime = d/type.getProfile().getAvgSpeed();
+        // p_el out = P+Po // TODO: calculate auxiliary power based on the driver profile
+        // for now the auxiliary power is assumed to be an additional 20% of energy consumption in the case of electric vehicles
+        double P1 = (Fr*type.getProfile().getAvgSpeed())/type.getProfile().getNm();
+        double P2 = (0.18/type.getProfile().getNg())*P1;
+        // the factor is divided by the Gain factor to make it ~ 0 in the case of non electric vehicles
+        double P = P1 + P2;
+        double E = P*travelTime;
+        return E;
     }
 
+    /**
+     * calculates energy consumption based on distance only, assuming an average energy cost of 0.25kW/km
+     * @param coord1
+     * @param coord2
+     * @return
+     */
     public static double calculateConsumptionConstant(Coordinate coord1, Coordinate coord2) {
-        double constant_value = 10;
-        return constant_value;
+        double value = 0.25*EuclideanDistanceCalculator.calculateDistance(coord1, coord2);
+        return value;
     }
 }

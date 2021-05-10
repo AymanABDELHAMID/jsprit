@@ -195,14 +195,14 @@ public class VehicleParameterReader {
             if (nm == null) {
                 throw new IllegalArgumentException("Vehicle mechanical efficiency is missing.");
             }
-            builder.setVehicleNM(Double.parseDouble(crr));
+            builder.setVehicleNM(Double.parseDouble(nm));
 
             //read vehicle gain efficiency
             String ng = vehicleProfileConfig.getString("ng");
             if (ng == null) {
                 throw new IllegalArgumentException("Vehicle gain efficiency is missing.");
             }
-            builder.setVehicleNG(Double.parseDouble(crr));
+            builder.setVehicleNG(Double.parseDouble(ng));
 
             // Build vehicle profile
             VehicleProfile profile = builder.build();

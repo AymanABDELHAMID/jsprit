@@ -1,6 +1,7 @@
 package com.graphhopper.jsprit.core.util;
 
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 
 import java.util.*;
 
@@ -40,12 +41,16 @@ public class VehicleProfiles {
 
         private Set<String> addedVehicleProfilesNames = new LinkedHashSet<>();
 
+        private  Map<String, VehicleProfile> vehicleProfilesMap = new HashMap<>();
+
+
         public Builder addProfile(VehicleProfile profile){
             if(addedVehicleProfilesNames.contains(profile.getName())){
                 throw new IllegalArgumentException("The vehicle Profile already has a similar profile for " + profile.getName() + ".");
             }
             else addedVehicleProfilesNames.add(profile.getName());
             vehicleProfiles.add(profile);
+            vehicleProfilesMap.put(profile.getName(), profile);
             return this;
         }
 
@@ -53,7 +58,7 @@ public class VehicleProfiles {
          * builds vehicle profiles
          */
         public VehicleProfiles build() {
-            return new VehicleProfiles(vehicleProfiles, addedVehicleProfilesNames);
+            return new VehicleProfiles(vehicleProfiles, addedVehicleProfilesNames, vehicleProfilesMap);
         }
 
     }
@@ -64,11 +69,13 @@ public class VehicleProfiles {
         }
         else addedVehicleProfilesNames.add(profile.getName());
         vehicleProfiles.add(profile);
+        vehicleProfilesMap.put(profile.getName(), profile);
     }
 
-    public VehicleProfiles(List<VehicleProfile> vehicleProfiles,  Set<String> addedVehicleProfilesNames) {
+    public VehicleProfiles(List<VehicleProfile> vehicleProfiles,  Set<String> addedVehicleProfilesNames,  Map<String, VehicleProfile> vehicleProfilesMap) {
         this.vehicleProfiles = vehicleProfiles;
         this.addedVehicleProfilesNames = addedVehicleProfilesNames;
+        this.vehicleProfilesMap = vehicleProfilesMap;
     }
 
     public List<VehicleProfile> getVehicleProfiles() {
@@ -78,6 +85,12 @@ public class VehicleProfiles {
     public Set<String> getAddedVehicleProfilesNames() {
         return addedVehicleProfilesNames;
     }
+
+    public Map<String, VehicleProfile> getVehicleProfilesMap() {
+        return vehicleProfilesMap;
+    }
+
+    public  Map<String, VehicleProfile> vehicleProfilesMap = new HashMap<>();
 
     @Override
     public String toString() {

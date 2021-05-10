@@ -14,6 +14,7 @@ import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 import com.graphhopper.jsprit.core.problem.constraint.HardActivityConstraint;
+import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.job.Service;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
@@ -25,14 +26,13 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl.Builder;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
-import com.graphhopper.jsprit.core.util.Coordinate;
-import com.graphhopper.jsprit.core.util.EuclideanDistanceCalculator;
-import com.graphhopper.jsprit.core.util.Solutions;
-import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
-import com.graphhopper.jsprit.io.problem.VrpXMLWriter;
+import com.graphhopper.jsprit.core.util.*;
+import com.graphhopper.jsprit.io.problem.VehicleParameterReader;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AM_example_2_BEV_WDist_Const {
@@ -137,6 +137,20 @@ public class AM_example_2_BEV_WDist_Const {
         final int BATTERY_INDEX = 0;
         vehicleTypeBuilder.addBatteryDimension(BATTERY_INDEX, 50); // Ayman: tested with small range and found no solution
 
+        /**
+         * setting the profile
+         */
+        vehicleTypeBuilder.setProfile("carBe");
+        // building the profile
+        VehicleProfiles.Builder vpBuilder = VehicleProfiles.Builder.newInstance();
+        String path = "vehicleParameters.xml"; // what if the xml file has a different name...
+        new VehicleParameterReader(vpBuilder).read(path);
+        VehicleProfiles vehicleProfiles = vpBuilder.build();
+        List<VehicleProfile> profiles = vehicleProfiles.getVehicleProfiles();
+        Map<String, VehicleProfile> profilesMap = vehicleProfiles.getVehicleProfilesMap();
+        VehicleProfile profile = profilesMap.get("carBe"); // can be replaced by getProfile_name.
+        vehicleTypeBuilder.buildProfile(profile);
+
         // Building the Vehicle
         VehicleType vehicleType = vehicleTypeBuilder.build();
 
@@ -160,7 +174,9 @@ public class AM_example_2_BEV_WDist_Const {
          * build services with id 1...4 at the required locations, each with a capacity-demand of 1.
          * Note, that the builder allows chaining which makes building quite handy
          */
-        Service service1 = Service.Builder.newInstance("Jakob").addSizeDimension(WEIGHT_INDEX,1).setLocation(Location.newInstance(0, 7)).build();
+        //Service service1 = Service.Builder.newInstance("Jakob").addSizeDimension(WEIGHT_INDEX,1).setLocation(Location.newInstance(0, 7)).build();
+        Service service1 = Service.Builder.newInstance("Jakob").addSizeDimension(WEIGHT_INDEX,1).
+            setLocation(Location.Builder.newInstance().setCoordinate(Coordinate.newInstance(0, 7)).setLoad(15).build()).build();
         Service service2 = Service.Builder.newInstance("Ayman").addSizeDimension(WEIGHT_INDEX,1).setLocation(Location.newInstance(5, 13)).build();
         Service service3 = Service.Builder.newInstance("Sebastian").addSizeDimension(WEIGHT_INDEX,1).setLocation(Location.newInstance(10, 7)).build();
         Service service4 = Service.Builder.newInstance("Tarek").addSizeDimension(WEIGHT_INDEX,1).setLocation(Location.newInstance(15, 13)).build();
@@ -179,7 +195,16 @@ public class AM_example_2_BEV_WDist_Const {
          * by default, transport costs are computed as Euclidean distances
          */
         VehicleRoutingTransportCostsMatrix costMatrix = createMatrix(vrpBuilder);
+        /**
+         * @author: Ayman
+         * 10.05.21
+         * testing the energy cost matrix, version one: only one vehicle type (homogenous fleet)
+         */
+
+        VehicleType type = vehicle.getType();
+        VehicleRoutingEnergyCostMatrix energyCostMatrix = createEnergyMatrix(vrpBuilder, type);
         vrpBuilder.setRoutingCost(costMatrix);
+        vrpBuilder.setEnergyCost(energyCostMatrix);
 
         VehicleRoutingProblem problem = vrpBuilder.setFleetSize(VehicleRoutingProblem.FleetSize.FINITE).build();
         // vrpBuilder.setFleetSize(VehicleRoutingProblem.FleetSize.FINITE);
@@ -249,8 +274,26 @@ public class AM_example_2_BEV_WDist_Const {
         return matrixBuilder.build();
     }
 
-    /*
-    Constructing an energy cost matrix
+    /**
+     * Constructing an energy cost matrix
+     * @param vrpBuilder
+     * @param type
+     * @return
      */
-    //double ii = vehicle.
+
+    private static VehicleRoutingEnergyCostMatrix createEnergyMatrix(VehicleRoutingProblem.Builder vrpBuilder, VehicleType type) {
+        VehicleRoutingEnergyCostMatrix.Builder matrixBuilder = VehicleRoutingEnergyCostMatrix.Builder.newInstance(true);
+        //Object[] type = vrpBuilder.getAddedVehicleTypes().stream().toArray();
+
+        for (String from : vrpBuilder.getLocationMap().keySet()) {
+            for (String to : vrpBuilder.getLocationMap().keySet()) {
+                Coordinate fromCoord = vrpBuilder.getLocationMap().get(from);
+                Coordinate toCoord = vrpBuilder.getLocationMap().get(to);
+                double load = vrpBuilder.getLocationClassMap().get(fromCoord).getLoad();
+                double consumption = EnergyConsumptionCalculator.calculateConsumption(fromCoord, toCoord, type, load);
+                matrixBuilder.addTransportConsumption(from, to, consumption);
+            }
+        }
+        return matrixBuilder.build();
+    }
 }

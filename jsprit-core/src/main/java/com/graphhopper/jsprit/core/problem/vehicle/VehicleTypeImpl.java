@@ -21,6 +21,9 @@ package com.graphhopper.jsprit.core.problem.vehicle;
 import com.graphhopper.jsprit.core.problem.Capacity;
 import com.graphhopper.jsprit.core.problem.BatteryAM;
 import com.graphhopper.jsprit.core.util.VehicleProfile;
+import com.graphhopper.jsprit.core.util.VehicleProfiles;
+
+import java.io.InputStream;
 
 /**
  * Implementation of {@link VehicleType}.
@@ -508,6 +511,11 @@ public class VehicleTypeImpl implements VehicleType {
             return this;
         }
 
+        public Builder buildProfile(VehicleProfile profile){
+            this.profile = profile;
+            return this;
+        }
+
         public Builder setEnergyType(int energy_type) {
             if (energy_type < 0 || energy_type > 3) throw new IllegalArgumentException("The energy type value must be one of the following: 1 (Fuel), 2 (Battery Electric), 3 (Hybrid)");
             this.energy_type = energy_type;
@@ -655,6 +663,11 @@ public class VehicleTypeImpl implements VehicleType {
     @Override
     public VehicleProfile getProfile() {
         return profile;
+    }
+
+    @Override
+    public String getProfileName() {
+        return profile_name;
     }
 
     @Override

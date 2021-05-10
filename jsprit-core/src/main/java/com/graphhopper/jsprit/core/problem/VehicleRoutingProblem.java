@@ -90,6 +90,8 @@ public class VehicleRoutingProblem {
 
         private Map<String, Coordinate> tentative_coordinates = new HashMap<>();
 
+        private Map<Coordinate, Location> tentative_locations = new HashMap<>();
+
         private FleetSize fleetSize = FleetSize.INFINITE;
 
         private Map<String, VehicleType> vehicleTypes = new HashMap<>();
@@ -169,6 +171,16 @@ public class VehicleRoutingProblem {
          */
         public Locations getLocations() {
             return id -> tentative_coordinates.get(id);
+        }
+
+        /**
+         * @author: Ayman
+         * @return map with locations
+         * This class is doing what ( @link : getLocationMap should be doing )
+         * The location map should return a location map not a coordinates map.
+         */
+        public Map<Coordinate, Location> getLocationClassMap() {
+            return Collections.unmodifiableMap(tentative_locations);
         }
 
         /**
@@ -257,6 +269,7 @@ public class VehicleRoutingProblem {
         private void addLocationToTentativeLocations(Location location) {
             if (location == null) return;
             tentative_coordinates.put(location.getId(), location.getCoordinate());
+            tentative_locations.put(location.getCoordinate(), location);
             allLocations.add(location);
         }
 
@@ -276,7 +289,7 @@ public class VehicleRoutingProblem {
             for (Vehicle v : uniqueVehicles) {
                 if (v.getBreak() != null) {
                     if (!uniqueBreakIds.add(v.getBreak().getId()))
-                        throw new IllegalArgumentException("The vehicle routing roblem already contains a vehicle break with id " + v.getBreak().getId() + ". Please choose unique ids for each vehicle break.");
+                        throw new IllegalArgumentException("The vehicle routing problem already contains a vehicle break with id " + v.getBreak().getId() + ". Please choose unique ids for each vehicle break.");
                     hasBreaks = true;
                     List<AbstractActivity> breakActivities = jobActivityFactory.createActivities(v.getBreak());
                     if (breakActivities.isEmpty())

@@ -78,6 +78,8 @@ public interface VehicleType {
      */
     VehicleProfile getProfile();
 
+    String getProfileName();
+
     /**
      * 30.04.21
      * Ayman M.

@@ -118,6 +118,15 @@ public class VehicleRoutingEnergyCostMatrix extends AbstractForwardVehicleEnergy
             }
             return this;
         }
+        /**
+         * Builds the matrix.
+         *
+         * @return matrix
+         */
+        public VehicleRoutingEnergyCostMatrix build() {
+            return new VehicleRoutingEnergyCostMatrix(this);
+        }
+
     }
     private Map<VehicleRoutingEnergyCostMatrix.RelationKey, Double> consumptions = new HashMap<VehicleRoutingEnergyCostMatrix.RelationKey, Double>();
 

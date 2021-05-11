@@ -37,7 +37,7 @@ public class EnergyConsumptionCalculator {
 
     /**
      * calculates energy consumption based on distance only, assuming an average energy cost of 0.25kW/km
-     * // TODO: ajouter lien.
+     * // https://enveurope.springeropen.com/articles/10.1186/s12302-020-00307-8
      * @param coord1
      * @param coord2
      * @return

@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-
+// TODO: Remove battery dimensions unused attribute
 
 /**
  * Contains and defines the vehicle routing problem.

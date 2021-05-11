@@ -250,7 +250,7 @@ public class AM_example_2_BEV_WDist_Const {
         /*
          * plot
          */
-        new Plotter(problem,bestSolution).plot("output/plot_simple_BEV_with_range_const.png","simple example with distance constraint");
+        new Plotter(problem,bestSolution).plot("output/plot_simple_BEV_with_range2_const.png","simple example with range constraint");
 
         /*
         render problem and solution with GraphStream

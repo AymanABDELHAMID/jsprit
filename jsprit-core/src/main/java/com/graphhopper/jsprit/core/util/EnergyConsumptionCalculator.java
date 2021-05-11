@@ -43,7 +43,7 @@ public class EnergyConsumptionCalculator {
      * @return
      */
     public static double calculateConsumptionConstant(Coordinate coord1, Coordinate coord2) {
-        double value = 0.25*EuclideanDistanceCalculator.calculateDistance(coord1, coord2);
+        double value = 0.25*1000*EuclideanDistanceCalculator.calculateDistance(coord1, coord2);
         return value;
     }
 }

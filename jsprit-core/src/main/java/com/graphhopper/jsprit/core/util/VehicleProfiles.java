@@ -1,7 +1,5 @@
 package com.graphhopper.jsprit.core.util;
 
-import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 
 import java.util.*;
 

@@ -14,7 +14,7 @@ public class EnergyConsumptionCalculator {
      * @return energy consumption needed
      */
     public static double calculateConsumption(Coordinate coord1, Coordinate coord2, VehicleType type, Double load) {
-        double mass = type.getProfile().getWeight() + load;
+        double mass = type.getProfile().getWeight() + load; // TODO: reverifier les ordres des job
         double slope = 0; // TODO: road grade is considered flat for now
         double g = 9.81;
         double rho = 1.055;
@@ -28,7 +28,7 @@ public class EnergyConsumptionCalculator {
         // p_el out = P+Po // TODO: calculate auxiliary power based on the driver profile
         // for now the auxiliary power is assumed to be an additional 20% of energy consumption in the case of electric vehicles
         double P1 = (Fr*type.getProfile().getAvgSpeed())/type.getProfile().getNm();
-        double P2 = (0.18/type.getProfile().getNg())*P1;
+        double P2 = (0.18/type.getProfile().getNg())*P1; // float MAX VALUE
         // the factor is divided by the Gain factor to make it ~ 0 in the case of non electric vehicles
         double P = P1 + P2;
         double E = P*travelTime;
@@ -37,6 +37,7 @@ public class EnergyConsumptionCalculator {
 
     /**
      * calculates energy consumption based on distance only, assuming an average energy cost of 0.25kW/km
+     * // TODO: ajouter lien.
      * @param coord1
      * @param coord2
      * @return

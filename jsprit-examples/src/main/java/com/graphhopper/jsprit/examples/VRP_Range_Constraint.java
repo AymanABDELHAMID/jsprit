@@ -19,10 +19,7 @@ import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.ActivityVisitor;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
-import com.graphhopper.jsprit.core.util.Coordinate;
-import com.graphhopper.jsprit.core.util.EuclideanDistanceCalculator;
-import com.graphhopper.jsprit.core.util.Solutions;
-import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
+import com.graphhopper.jsprit.core.util.*;
 import com.graphhopper.jsprit.io.problem.VrpXMLReader;
 
 
@@ -54,6 +51,8 @@ public class VRP_Range_Constraint  {
         private final StateManager stateManager;
 
         private final VehicleRoutingTransportCostsMatrix costMatrix;
+        private final VehicleRoutingEnergyCostMatrix energyCostMatrix;
+
 
         //        private final StateFactory.StateId distanceStateId;    //v1.3.1
         private final StateId distanceStateId; //head of development - upcoming release
@@ -64,8 +63,10 @@ public class VRP_Range_Constraint  {
 
         private TourActivity prevAct;
 
-        public DistanceUpdater(StateId distanceStateId, StateManager stateManager, VehicleRoutingTransportCostsMatrix transportCosts) {
-            this.costMatrix = transportCosts;
+
+        public DistanceUpdater(StateId distanceStateId, StateManager stateManager, VehicleRoutingTransportCostsMatrix costMatrix, VehicleRoutingEnergyCostMatrix energyCosts) {
+            this.costMatrix = costMatrix;
+            this.energyCostMatrix = energyCosts;
             this.stateManager = stateManager;
             this.distanceStateId = distanceStateId;
         }
@@ -79,19 +80,23 @@ public class VRP_Range_Constraint  {
 
         @Override
         public void visit(TourActivity tourActivity) {
-            distance += getDistance(prevAct, tourActivity);
+            distance += getConsumption(prevAct, tourActivity);
             prevAct = tourActivity;
         }
 
         @Override
         public void finish() {
-            distance += getDistance(prevAct, vehicleRoute.getEnd());
+            distance += getConsumption(prevAct, vehicleRoute.getEnd());
     //            stateManager.putTypedRouteState(vehicleRoute,distanceStateId,Double.class,distance); //v1.3.1
             stateManager.putRouteState(vehicleRoute, distanceStateId, distance); //head of development - upcoming release (v1.4)
         }
 
         double getDistance(TourActivity from, TourActivity to) {
             return costMatrix.getDistance(from.getLocation().getId(), to.getLocation().getId());
+        }
+
+        double getConsumption(TourActivity from, TourActivity to) {
+            return energyCostMatrix.getConsumption(from.getLocation().getId(), to.getLocation().getId());
         }
     }
 
@@ -101,21 +106,23 @@ public class VRP_Range_Constraint  {
         private final StateManager stateManager;
 
         private final VehicleRoutingTransportCostsMatrix costsMatrix;
+        private final VehicleRoutingEnergyCostMatrix energyCostMatrix;
 
         private final double maxDistance;
 
         private final StateId distanceStateId;
 
-        RangeConstraint(double maxDistance, StateId distanceStateId, StateManager stateManager, VehicleRoutingTransportCostsMatrix transportCosts) { //get maximum distance from range of vehicle
+        RangeConstraint(double maxDistance, StateId distanceStateId, StateManager stateManager, VehicleRoutingTransportCostsMatrix transportCosts, VehicleRoutingEnergyCostMatrix energyCostMatrix) { //get maximum distance from range of vehicle
             this.costsMatrix = transportCosts;
             this.maxDistance = maxDistance;
             this.stateManager = stateManager;
             this.distanceStateId = distanceStateId;
+            this.energyCostMatrix = energyCostMatrix;
         }
 
         @Override
         public ConstraintsStatus fulfilled(JobInsertionContext context, TourActivity prevAct, TourActivity newAct, TourActivity nextAct, double v) {
-            double additionalDistance = getDistance(prevAct, newAct) + getDistance(newAct, nextAct) - getDistance(prevAct, nextAct);
+            double additionalDistance = getConsumption(prevAct, newAct) + getConsumption(newAct, nextAct) - getConsumption(prevAct, nextAct);
             Double routeDistance = stateManager.getRouteState(context.getRoute(), distanceStateId, Double.class);
             if (routeDistance == null) routeDistance = 0.;
             double newRouteDistance = routeDistance + additionalDistance;
@@ -126,6 +133,10 @@ public class VRP_Range_Constraint  {
 
         double getDistance(TourActivity from, TourActivity to) {
             return costsMatrix.getDistance(from.getLocation().getId(), to.getLocation().getId());
+        }
+
+        double getConsumption(TourActivity from, TourActivity to) {
+            return energyCostMatrix.getConsumption(from.getLocation().getId(), to.getLocation().getId());
         }
 
     }
@@ -140,74 +151,7 @@ public class VRP_Range_Constraint  {
     double getDistance(TourActivity from, TourActivity to, VehicleRoutingTransportCostsMatrix costsMatrix) {
         return costsMatrix.getDistance(from.getLocation().getId(), to.getLocation().getId());
     }
-    public static void main(String[] args) {
-
-        /*
-         * some preparation - create output folder
-         */
-        File dir = new File("output");
-        // if the directory does not exist, create it
-        if (!dir.exists()) {
-            System.out.println("creating directory ./output");
-            boolean result = dir.mkdir();
-            if (result) System.out.println("./output created");
-        }
-
-        VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
-        new VrpXMLReader(vrpBuilder).read("C:\\Users\\AYMAN\\OneDrive - CentraleSupelec\\CentraleSupelec\\M2_MACLO\\Recherche\\Mémoire Thématique\\co"+
-            "de\\jsprit\\jsprit-examples\\input\\pickups_and_deliveries_withBEV_withoutTWs_AM.xml");
-        //builds a matrix based on euclidean distances; t_ij = euclidean(i,j) / 2; d_ij = euclidean(i,j)
-        VehicleRoutingTransportCostsMatrix costMatrix = createMatrix(vrpBuilder);
-        vrpBuilder.setRoutingCost(costMatrix);
-        VehicleRoutingProblem vrp = vrpBuilder.build();
-
-
-        StateManager stateManager = new StateManager(vrp); //head of development - upcoming release (v1.4)
-
-        StateId distanceStateId = stateManager.createStateId("distance"); //head of development - upcoming release (v1.4)
-        stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, costMatrix));
-
-        ConstraintManager constraintManager = new ConstraintManager(vrp, stateManager);
-        /**
-         * Adding maximum distance from maximum battery range
-         */
-        //Collection<VehicleType> h = vrpBuilder.getAddedVehicleTypes();
-
-        //final double MAX_Range = 500.;
-
-        //vehicleMap.get(vehicleID).getType().getBatteryDimensions().getRange(0); //getBatteryRange(vehicleID);
-        final double MAX_Range = vrpBuilder.getAddedVehicles().stream().collect(Collectors.toList()).get(0).getType().getBatteryDimensions().getRange(0);
-
-        constraintManager.addConstraint(new RangeConstraint(MAX_Range, distanceStateId, stateManager, costMatrix), ConstraintManager.Priority.CRITICAL);
-
-        VehicleRoutingAlgorithm vra = Jsprit.Builder.newInstance(vrp).setStateAndConstraintManager(stateManager,constraintManager)
-            .buildAlgorithm();
-        vra.setMaxIterations(250);
-
-        Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
-
-        SolutionPrinter.print(vrp, Solutions.bestOf(solutions), SolutionPrinter.Print.VERBOSE);
-
-        /*
-         * plot
-         */
-        new Plotter(vrp, Solutions.bestOf(solutions)).plot("output/plot_vrp_range_AM", "plot");
-    }
-
-    private static VehicleRoutingTransportCostsMatrix createMatrix(VehicleRoutingProblem.Builder vrpBuilder) {
-        VehicleRoutingTransportCostsMatrix.Builder matrixBuilder = VehicleRoutingTransportCostsMatrix.Builder.newInstance(true);
-        for (String from : vrpBuilder.getLocationMap().keySet()) {
-            for (String to : vrpBuilder.getLocationMap().keySet()) {
-                Coordinate fromCoord = vrpBuilder.getLocationMap().get(from);
-                Coordinate toCoord = vrpBuilder.getLocationMap().get(to);
-                double distance = EuclideanDistanceCalculator.calculateDistance(fromCoord, toCoord);
-                matrixBuilder.addTransportDistance(from, to, distance);
-                matrixBuilder.addTransportTime(from, to, (distance / 2.));
-            }
-        }
-        return matrixBuilder.build();
-    }
-
-//TODO: Add solution analyzer, check example in VRPWithBackhaulsExample2
 }
+
+
 

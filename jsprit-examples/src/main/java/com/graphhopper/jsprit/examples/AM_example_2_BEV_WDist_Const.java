@@ -14,7 +14,6 @@ import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 import com.graphhopper.jsprit.core.problem.constraint.HardActivityConstraint;
-import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.job.Service;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
@@ -33,7 +32,6 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class AM_example_2_BEV_WDist_Const {
 
@@ -135,7 +133,7 @@ public class AM_example_2_BEV_WDist_Const {
 
         // .addBatteryDimension(dimensionIndex,range)
         final int BATTERY_INDEX = 0;
-        vehicleTypeBuilder.addBatteryDimension(BATTERY_INDEX, 50); // Ayman: tested with small range and found no solution
+        vehicleTypeBuilder.addBatteryDimension(BATTERY_INDEX, 3000); // Ayman: tested with small range and found no solution
 
         /**
          * setting the profile
@@ -220,13 +218,13 @@ public class AM_example_2_BEV_WDist_Const {
         StateManager stateManager = new StateManager(problem); //head of development - upcoming release (v1.4)
 
         StateId distanceStateId = stateManager.createStateId("distance"); //head of development - upcoming release (v1.4)
-        stateManager.addStateUpdater(new VRP_Range_Constraint.DistanceUpdater(distanceStateId, stateManager, costMatrix));
+        stateManager.addStateUpdater(new VRP_Range_Constraint.DistanceUpdater(distanceStateId, stateManager, costMatrix, energyCostMatrix));
 
         ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 
         final double MAX_Range = vehicle.getType().getBatteryDimensions().getRange(0); // TODO: if we have more than one range we can try to include a list of ranges into the constraint.
 
-        constraintManager.addConstraint(new VRP_Range_Constraint.RangeConstraint(MAX_Range, distanceStateId, stateManager, costMatrix), ConstraintManager.Priority.CRITICAL);
+        constraintManager.addConstraint(new VRP_Range_Constraint.RangeConstraint(MAX_Range, distanceStateId, stateManager, costMatrix, energyCostMatrix), ConstraintManager.Priority.CRITICAL);
 
         VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem).setStateAndConstraintManager(stateManager,constraintManager)
             .buildAlgorithm();
@@ -252,7 +250,7 @@ public class AM_example_2_BEV_WDist_Const {
         /*
          * plot
          */
-        new Plotter(problem,bestSolution).plot("output/plot_simple_BEV_with_dist_const.png","simple example with distance constraint");
+        new Plotter(problem,bestSolution).plot("output/plot_simple_BEV_with_range_const.png","simple example with distance constraint");
 
         /*
         render problem and solution with GraphStream
@@ -283,8 +281,6 @@ public class AM_example_2_BEV_WDist_Const {
 
     private static VehicleRoutingEnergyCostMatrix createEnergyMatrix(VehicleRoutingProblem.Builder vrpBuilder, VehicleType type) {
         VehicleRoutingEnergyCostMatrix.Builder matrixBuilder = VehicleRoutingEnergyCostMatrix.Builder.newInstance(true);
-        //Object[] type = vrpBuilder.getAddedVehicleTypes().stream().toArray();
-
         for (String from : vrpBuilder.getLocationMap().keySet()) {
             for (String to : vrpBuilder.getLocationMap().keySet()) {
                 Coordinate fromCoord = vrpBuilder.getLocationMap().get(from);

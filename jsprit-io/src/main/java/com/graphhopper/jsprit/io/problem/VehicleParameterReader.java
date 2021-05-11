@@ -1,11 +1,6 @@
 package com.graphhopper.jsprit.io.problem;
 
 
-import com.graphhopper.jsprit.core.problem.Location;
-import com.graphhopper.jsprit.core.problem.job.Delivery;
-import com.graphhopper.jsprit.core.problem.job.Pickup;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.util.Resource;
 import com.graphhopper.jsprit.core.util.VehicleProfile;
 /**

@@ -222,7 +222,7 @@ public class AM_example_2_BEV_WDist_Const {
 
         ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 
-        final double MAX_Range = vehicle.getType().getBatteryDimensions().getRange(0); // TODO: if we have more than one range we can try to include a list of ranges into the constraint.
+        final double MAX_Range = vehicle.getType().getBatteryDimensions().getRange(0);
 
         constraintManager.addConstraint(new VRP_Range_Constraint.RangeConstraint(MAX_Range, distanceStateId, stateManager, costMatrix, energyCostMatrix), ConstraintManager.Priority.CRITICAL);
 

@@ -7,6 +7,7 @@ public class EnergyConsumptionCalculator {
 
     /**
      * Calculates energy consumption based on vehicle type, load on vehicle crossing the arc and distance.
+     * Asamer et al. 2016 (LDM)
      * @param coord1
      * @param coord2
      * @param type
@@ -34,6 +35,23 @@ public class EnergyConsumptionCalculator {
         double E = P*travelTime;
         return E;
     }
+
+    public static double calculateConsumptionGoekeSchneider(Coordinate coord1, Coordinate coord2, VehicleType type, Double load){
+        return load;
+    }
+
+    public static double calculateConsumptionCatrina(Coordinate coord1, Coordinate coord2, VehicleType type, Double load){
+        return load;
+    }
+
+    public static double calculateConsumptionHiermann(Coordinate coord1, Coordinate coord2, VehicleType type, Double load){
+        return load;
+    }
+
+    public static double calculateConsumptionMontoya(Coordinate coord1, Coordinate coord2, VehicleType type, Double load){
+        return load;
+    }
+
 
     /**
      * calculates energy consumption based on distance only, assuming an average energy cost of 0.25kW/km

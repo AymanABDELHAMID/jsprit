@@ -19,6 +19,8 @@ package com.graphhopper.jsprit.core.problem.solution;
 
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
+import com.graphhopper.jsprit.core.util.VehicleRoutingEnergyCostMatrix;
+import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,6 +49,101 @@ public class VehicleRoutingProblemSolution {
 
     private double cost;
 
+    /**
+     * @author: Ayman M.
+     * creating a costs class that contains:
+     *  - Energy Consumption Costs of the solution
+     *  - Waiting Time Costs of the solution
+     *  - Travel distance costs of the solution
+     *  - Travel time cost of the solution
+     */
+    private class solutionCosts {
+        private double energyCosts = 0;
+        private double waitingCosts = 0;
+        private double distanceCosts = 0;
+        private double timeCosts = 0;
+
+        private solutionCosts(solutionCosts costs){
+            this.distanceCosts = costs.getDistanceCosts();
+            this.energyCosts = costs.getEnergyCosts();
+            this.timeCosts = costs.getTimeCosts();
+            this.waitingCosts = costs.getWaitingCosts();
+        }
+
+        /**
+         * Constructs a solutionsCost using the vehicle routing problem transport and energy costs
+         * @param energyCostMatrix
+         * @param transportCostMatrix
+         */
+        private solutionCosts(VehicleRoutingEnergyCostMatrix energyCostMatrix, VehicleRoutingTransportCostsMatrix transportCostMatrix){
+            // TODO: need to find the relationship between routingCosts and the costMatrices
+            this.distanceCosts = 0;
+            this.energyCosts = 0;
+            this.timeCosts = 0;
+            this.waitingCosts = 0;
+        }
+
+        private solutionCosts(double distanceCosts, double energyCosts, double timeCosts, double waitingCosts){
+            // TODO: need to find the relationship between routingCosts and the costMatrices
+            this.distanceCosts = distanceCosts;
+            this.energyCosts = energyCosts;
+            this.timeCosts = timeCosts;
+            this.waitingCosts = waitingCosts;
+        }
+
+        /**
+         * Main constructor
+         * @param solution
+         */
+        private solutionCosts(VehicleRoutingProblemSolution solution){
+           this.distanceCosts = solution.getCost();
+           this.energyCosts = 0;
+           this.timeCosts = 0;
+           this.waitingCosts = 0;
+        }
+
+        /**
+         * TODO: use the new routes attribute (costs)
+         * @param routes
+         */
+        private solutionCosts(Collection<VehicleRoute> routes){
+            this.distanceCosts = 0;
+            this.energyCosts = 0;
+            this.timeCosts = 0;
+            this.waitingCosts = 0;
+        }
+
+        public double getEnergyCosts() {
+            return energyCosts;
+        }
+
+        public double getWaitingCosts() {
+            return waitingCosts;
+        }
+
+        public double getDistanceCosts() {
+            return distanceCosts;
+        }
+
+        public double getTimeCosts() {
+            return timeCosts;
+        }
+
+        @Override
+        public String toString() {
+            return "solutionCosts{" +
+                "energyCosts=" + energyCosts +
+                ", waitingCosts=" + waitingCosts +
+                ", distanceCosts=" + distanceCosts +
+                ", timeCosts=" + timeCosts +
+                '}';
+        }
+
+
+    }
+
+    private solutionCosts solutionCosts = new solutionCosts(this);
+
     private VehicleRoutingProblemSolution(VehicleRoutingProblemSolution solution) {
         routes = new ArrayList<VehicleRoute>();
         for (VehicleRoute r : solution.getRoutes()) {
@@ -55,6 +152,7 @@ public class VehicleRoutingProblemSolution {
         }
         this.cost = solution.getCost();
         unassignedJobs.addAll(solution.getUnassignedJobs());
+        this.solutionCosts = solution.getSolutionCosts();
     }
 
     /**
@@ -67,7 +165,9 @@ public class VehicleRoutingProblemSolution {
         super();
         this.routes = routes;
         this.cost = cost;
+        this.solutionCosts = new solutionCosts(cost, 0,0,0);
     }
+
 
     /**
      * Constructs a solution with a number of {@link VehicleRoute}s, bad jobs and their corresponding aggregate cost value.
@@ -104,10 +204,18 @@ public class VehicleRoutingProblemSolution {
     /**
      * Sets the costs of this solution.
      *
-     * @param cost the cost to assigned to this solution
+     * @param cost the cost assigned to this solution
      */
     public void setCost(double cost) {
         this.cost = cost;
+    }
+
+    /**
+     * Returns the solution costs (energy, time, waiting, distance)
+     * @return solutionCosts
+     */
+    public VehicleRoutingProblemSolution.solutionCosts getSolutionCosts() {
+        return solutionCosts;
     }
 
     /**

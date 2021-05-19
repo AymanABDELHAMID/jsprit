@@ -35,6 +35,7 @@ import java.util.*;
  * @author stefan
  */
 public class VehicleRoute {
+    // TODO: understand route, vehicle costs, associate costs to vehicle profile...
 
     /**
      * Returns a deep copy of this vehicleRoute.
@@ -120,9 +121,9 @@ public class VehicleRoute {
         private final Set<Shipment> openShipments = new HashSet<Shipment>();
 
         private JobActivityFactory jobActivityFactory = new JobActivityFactory() {
-            
+
             private final TourShipmentActivityFactory shipmentActivityFactory = new DefaultShipmentActivityFactory();
-            
+
             private final  TourActivityFactory serviceActivityFactory = new DefaultTourActivityFactory();
 
             @Override

@@ -95,6 +95,7 @@ public class MultipleTimeWindowExample {
         ;
         vrpBuilder.setFleetSize(VehicleRoutingProblem.FleetSize.FINITE);
         vrpBuilder.setRoutingCost(new ManhattanCosts());
+        // TODO: add new set energy costs
         VehicleRoutingProblem problem = vrpBuilder.build();
 
 		/*

@@ -438,7 +438,7 @@ public class Jsprit {
         double noiseProbability = toDouble(getProperty(Parameter.INSERTION_NOISE_PROB.toString()));
 
         JobNeighborhoods jobNeighborhoods = new JobNeighborhoodsFactory().createNeighborhoods(vrp, new AvgServiceAndShipmentDistance(vrp.getTransportCosts()), (int) (vrp.getJobs().values().size() * 0.5));
-        jobNeighborhoods.initialise();
+        jobNeighborhoods.initialise(); // TODO : discover job neighborhoods
 
         final double maxCosts;
         if(properties.containsKey(Parameter.MAX_TRANSPORT_COSTS.toString())){
@@ -763,7 +763,7 @@ public class Jsprit {
             @Override
             public double getCosts(VehicleRoutingProblemSolution solution) {
                 double costs = 0.;
-
+                // TODO : add energy specific costs
                 for (VehicleRoute route : solution.getRoutes()) {
                     costs += route.getVehicle().getType().getVehicleCostParams().fix;
                     boolean hasBreak = false;

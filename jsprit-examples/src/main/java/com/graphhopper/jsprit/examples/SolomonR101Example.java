@@ -25,8 +25,9 @@ import com.graphhopper.jsprit.core.algorithm.selector.SelectBest;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
-import com.graphhopper.jsprit.io.problem.VrpXMLReader;
+//import com.graphhopper.jsprit.io.problem.VrpXMLReader;
 import com.graphhopper.jsprit.util.Examples;
+import com.graphhopper.jsprit.instance.reader.SolomonReader;
 
 import java.util.Collection;
 
@@ -49,8 +50,9 @@ public class SolomonR101Example {
 		/*
          * A solomonReader reads solomon-instance files, and stores the required information in the builder.
 		 */
-//		new SolomonReader(vrpBuilder).read("/Users/schroeder/IdeaProjects/jsprit/jsprit-instances/instances/solomon/R211.txt");
-        new VrpXMLReader(vrpBuilder).read("output/R211.xml");
+		new SolomonReader(vrpBuilder).read("jsprit-instances/instances/solomon/R211.txt");
+//        new VrpXMLReader(vrpBuilder).read("output/R211.xml");
+//        new VrpXMLReader(vrpBuilder).read("jsprit-instances/instances/solomon/R211.txt"); // Can't read .txr with an xml reader
         /*
          * Finally, the problem can be built. By default, transportCosts are crowFlyDistances (as usually used for vrp-instances).
 		 */

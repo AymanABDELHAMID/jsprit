@@ -62,6 +62,15 @@ public class ConstraintManager implements HardActivityConstraint, HardRouteConst
 
     private boolean skillconstraintSet = false;
 
+    /**
+     * 20.05.21
+     * @author Ayman M.
+     */
+
+    private boolean energyConsumptionConstraintSet = false;
+
+    private boolean energyRecuperationConstraintSet = false;
+
     private final DependencyType[] dependencyTypes;
 
     public ConstraintManager(VehicleRoutingProblem vrp, RouteAndActivityStateGetter stateManager) {
@@ -155,6 +164,22 @@ public class ConstraintManager implements HardActivityConstraint, HardRouteConst
             addConstraint(new ServiceLoadRouteLevelConstraint(stateManager));
             addConstraint(new ServiceLoadActivityLevelConstraint(stateManager), Priority.LOW);
             loadConstraintsSet = true;
+        }
+    }
+
+    /**
+     * @author: Ayman M.
+     */
+
+    public void addEnergyConsumptionConstraint() {
+        if(!energyConsumptionConstraintSet){
+            energyConsumptionConstraintSet = true;
+        }
+    }
+
+    public void addEnergyRecuperationConstraint(){
+        if(!energyRecuperationConstraintSet){
+            energyRecuperationConstraintSet = true;
         }
     }
 

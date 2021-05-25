@@ -4,10 +4,13 @@ package com.graphhopper.jsprit.core.problem.constraint;
 import com.graphhopper.jsprit.core.algorithm.state.StateId;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.algorithm.state.StateUpdater;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.ActivityVisitor;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
+import com.graphhopper.jsprit.core.problem.solution.route.state.RouteAndActivityStateGetter;
 import com.graphhopper.jsprit.core.util.VehicleRoutingEnergyCostMatrix;
 import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 
@@ -16,7 +19,7 @@ import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
  */
 
 
-public class EnergyConsumptionRouteLevelConstraint {
+public class EnergyConsumptionRouteLevelConstraint implements HardActivityConstraint {
 
     static class DistanceUpdater implements StateUpdater, ActivityVisitor {
 
@@ -72,46 +75,49 @@ public class EnergyConsumptionRouteLevelConstraint {
         }
     }
 
-    // Reminder: There is a maximum distance constraint that we can use.
-    static class RangeConstraint implements HardActivityConstraint {
+    private RouteAndActivityStateGetter states;
 
-        private final StateManager stateManager;
+    private VehicleRoutingTransportCosts routingCosts;
 
-        private final VehicleRoutingTransportCostsMatrix costsMatrix;
-        private final VehicleRoutingEnergyCostMatrix energyCostMatrix;
+    private VehicleRoutingActivityCosts activityCosts;
 
-        private final double maxDistance;
 
-        private final StateId distanceStateId;
+    private final StateManager stateManager;
 
-        RangeConstraint(double maxDistance, StateId distanceStateId, StateManager stateManager, VehicleRoutingTransportCostsMatrix transportCosts, VehicleRoutingEnergyCostMatrix energyCostMatrix) { //get maximum distance from range of vehicle
-            this.costsMatrix = transportCosts;
-            this.maxDistance = maxDistance;
-            this.stateManager = stateManager;
-            this.distanceStateId = distanceStateId;
-            this.energyCostMatrix = energyCostMatrix;
-        }
+    private final VehicleRoutingTransportCostsMatrix costsMatrix;
+    private final VehicleRoutingEnergyCostMatrix energyCostMatrix;
 
-        @Override
-        public ConstraintsStatus fulfilled(JobInsertionContext context, TourActivity prevAct, TourActivity newAct, TourActivity nextAct, double v) {
-            double additionalDistance = getConsumption(prevAct, newAct) + getConsumption(newAct, nextAct) - getConsumption(prevAct, nextAct);
-            Double routeDistance = stateManager.getRouteState(context.getRoute(), distanceStateId, Double.class);
-            if (routeDistance == null) routeDistance = 0.;
-            double newRouteDistance = routeDistance + additionalDistance;
-            if (newRouteDistance > maxDistance) {
-                return ConstraintsStatus.NOT_FULFILLED;
-            } else return ConstraintsStatus.FULFILLED;
-        }
+    private final double maxDistance;
 
-        double getDistance(TourActivity from, TourActivity to) {
-            return costsMatrix.getDistance(from.getLocation().getId(), to.getLocation().getId());
-        }
+    private final StateId distanceStateId;
 
-        double getConsumption(TourActivity from, TourActivity to) {
-            return energyCostMatrix.getConsumption(from.getLocation().getId(), to.getLocation().getId());
-        }
-
+    EnergyConsumptionRouteLevelConstraint(double maxDistance, StateId distanceStateId, StateManager stateManager, VehicleRoutingTransportCostsMatrix transportCosts, VehicleRoutingEnergyCostMatrix energyCostMatrix) { //get maximum distance from range of vehicle
+        this.costsMatrix = transportCosts;
+        this.maxDistance = maxDistance;
+        this.stateManager = stateManager;
+        this.distanceStateId = distanceStateId;
+        this.energyCostMatrix = energyCostMatrix;
     }
+
+    @Override
+    public ConstraintsStatus fulfilled(JobInsertionContext context, TourActivity prevAct, TourActivity newAct, TourActivity nextAct, double v) {
+        double additionalDistance = getConsumption(prevAct, newAct) + getConsumption(newAct, nextAct) - getConsumption(prevAct, nextAct);
+        Double routeDistance = stateManager.getRouteState(context.getRoute(), distanceStateId, Double.class);
+        if (routeDistance == null) routeDistance = 0.;
+        double newRouteDistance = routeDistance + additionalDistance;
+        if (newRouteDistance > maxDistance) {
+            return ConstraintsStatus.NOT_FULFILLED;
+        } else return ConstraintsStatus.FULFILLED;
+    }
+
+    double getDistance(TourActivity from, TourActivity to) {
+        return costsMatrix.getDistance(from.getLocation().getId(), to.getLocation().getId());
+    }
+
+    double getConsumption(TourActivity from, TourActivity to) {
+        return energyCostMatrix.getConsumption(from.getLocation().getId(), to.getLocation().getId());
+    }
+
 
     /**
      *

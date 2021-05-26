@@ -17,10 +17,7 @@
  */
 package com.graphhopper.jsprit.core.problem.job;
 
-import com.graphhopper.jsprit.core.problem.AbstractJob;
-import com.graphhopper.jsprit.core.problem.Capacity;
-import com.graphhopper.jsprit.core.problem.Location;
-import com.graphhopper.jsprit.core.problem.Skills;
+import com.graphhopper.jsprit.core.problem.*;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindows;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindowsImpl;
@@ -78,6 +75,17 @@ public class Service extends AbstractJob {
         protected Capacity.Builder capacityBuilder = Capacity.Builder.newInstance();
 
         protected Capacity capacity;
+
+        /**
+         * 26.05
+         * @author Ayman M.
+         * adding the battery attribute to the game
+         * TODO : Change BatteryAM to Battery
+         * TODO : make sure the battery is the object of interest and not another object such as : batteryCharger..
+         */
+        protected BatteryAM.Builder batteryBuilder = BatteryAM.Builder.newInstance();
+
+        protected BatteryAM battery;
 
         protected Skills.Builder skillBuilder = Skills.Builder.newInstance();
 
@@ -266,6 +274,11 @@ public class Service extends AbstractJob {
 //            this.maxTimeInVehicle = maxTimeInVehicle;
 //            return this;
         }
+
+        /**
+         * @author Ayman M.
+         * adding all
+         */
     }
 
     private final String id;

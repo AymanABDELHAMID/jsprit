@@ -7,7 +7,6 @@ import com.graphhopper.jsprit.core.problem.solution.route.activity.ActivityVisit
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeKey;
-import jdk.internal.net.http.websocket.Transport;
 
 import java.util.*;
 
@@ -25,7 +24,6 @@ public class VehicleDependentStateOfCharge  implements StateUpdater, ActivityVis
 
         public State(Location prevLocation, double consumption) {
             this.prevLocation = prevLocation;
-            this.consumption = consumption;
         }
 
         public Location getPrevLocation() {
@@ -47,7 +45,7 @@ public class VehicleDependentStateOfCharge  implements StateUpdater, ActivityVis
 
     private List<Vehicle> uniqueVehicles;
 
-    private Map<VehicleTypeKey, VehicleDependentStateOfCharge.State> states;
+    private Map<VehicleTypeKey, State> states;
 
     public VehicleDependentStateOfCharge(TransportConsumption transportConsumptionMatrices, StateManager stateManager, StateId consumptionInRouteId, Collection<Vehicle> vehicles) {
         this.transportConsumption = transportConsumptionMatrices;

@@ -3,7 +3,6 @@ package com.graphhopper.jsprit.core.algorithm.state;
 import com.graphhopper.jsprit.core.algorithm.recreate.listener.InsertionStartsListener;
 import com.graphhopper.jsprit.core.algorithm.recreate.listener.JobInsertedListener;
 import com.graphhopper.jsprit.core.problem.BatteryAM;
-import com.graphhopper.jsprit.core.problem.Capacity;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.job.Delivery;
 import com.graphhopper.jsprit.core.problem.job.Job;
@@ -12,11 +11,9 @@ import com.graphhopper.jsprit.core.problem.job.Service;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.ActivityVisitor;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
-import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeKey;
+import com.graphhopper.jsprit.core.util.EnergyConsumptionCalculator;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,21 +41,15 @@ public class UpdateStateOfCharge implements ActivityVisitor, StateUpdater, Inser
 
         Location prevLocation;
 
-        double distance;
-
-        public State(Location prevLocation, double distance) {
+        public State(Location prevLocation) {
             this.prevLocation = prevLocation;
-            this.distance = distance;
         }
 
         public Location getPrevLocation() {
             return prevLocation;
         }
-
-        public double getDistance() {
-            return distance;
-        }
     }
+
 
     private Map<VehicleRoute, State> states;
 
@@ -69,15 +60,23 @@ public class UpdateStateOfCharge implements ActivityVisitor, StateUpdater, Inser
     }
 
     void insertionStarts(VehicleRoute route) {
-        double energyCostAtDepot;
-        double energyCostAtEnd;
+        BatteryAM energyCostAtDepot = BatteryAM.Builder.newInstance().build();
+        BatteryAM energyCostAtEnd = BatteryAM.Builder.newInstance().build();
         for (Job j : route.getTourActivities().getJobs()) {
+            /**
+             * Calculating the consumption at the job
+             */
+            double energyConsumption;
+            UpdateStateOfCharge.State old = states.get(route);
+            energyConsumption = EnergyConsumptionCalculator.calculateConsumption(old.getPrevLocation().getCoordinate(), j.getActivities().get(0).getLocation().getCoordinate(),
+                route.getVehicle().getType(), j.getActivities().get(0).getLocation().getLoad());
+            // TODO : ask why there is a list of activities for every job and how to get around that
+            // TODO : getLoad from Job
+            BatteryAM consumptionCost = BatteryAM.Builder.newInstance().addDimension(0,energyConsumption).build();
             if (j instanceof Delivery) {
-                energyCostAtDepot += stateManager.getVrp().getEnergyConsumption().g
-                    //Capacity.addup(loadAtDepot, j.getSize());
+                energyCostAtDepot = BatteryAM.subtractRange(energyCostAtDepot, consumptionCost);
             } else if (j instanceof Pickup || j instanceof Service) {
-                energyCostAtEnd +=
-                    //Capacity.addup(loadAtEnd, j.getSize());
+                energyCostAtEnd = BatteryAM.subtractRange(energyCostAtEnd, consumptionCost);
             }
         }
         stateManager.putTypedInternalRouteState(route, InternalStates.STATE_OF_CHARGE_AT_BEGINNING, energyCostAtDepot);
@@ -96,12 +95,16 @@ public class UpdateStateOfCharge implements ActivityVisitor, StateUpdater, Inser
 
     @Override
     public void begin(VehicleRoute route) {
-
+        currentStateOfCharge = stateManager.getRouteState(route, InternalStates.STATE_OF_CHARGE_AT_BEGINNING, BatteryAM.class);
+        if (currentStateOfCharge == null) currentStateOfCharge = defaultValue;
+        this.route = route;
     }
 
     @Override
     public void visit(TourActivity activity) {
-
+        //State old = states.get(v.getVehicleTypeIdentifier());
+        //currentStateOfCharge = BatteryAM.subtractRange(currentStateOfCharge);
+        //stateManager.putInternalTypedActivityState(act, InternalStates.LOAD, currentLoad);
     }
 
     @Override

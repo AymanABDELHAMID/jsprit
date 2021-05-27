@@ -62,6 +62,12 @@ public class StateManager implements RouteAndActivityStateGetter, IterationStart
 
     private boolean updateTWs = false;
 
+    /**
+     * @author Ayman
+     * add State of Charge Related state updaters
+     */
+    private boolean updateStateOfCharge = false;
+
     private final int initialNoStates = 21;
 
     private int stateIndexCounter;
@@ -520,6 +526,14 @@ public class StateManager implements RouteAndActivityStateGetter, IterationStart
     }
 
     /**
+     * @author Ayman
+     * VRP Getter
+     */
+    public VehicleRoutingProblem getVrp() {
+        return vrp;
+    }
+
+    /**
      * Adds an activityVisitor.
      * <p>This visitor visits all activities in a route subsequently in two cases. First, if insertionStart (after ruinStrategies have removed activities from routes)
      * and, second, if a job has been inserted and thus if a route has changed.
@@ -618,6 +632,19 @@ public class StateManager implements RouteAndActivityStateGetter, IterationStart
             addActivityVisitor(new UpdateMaxCapacityUtilisationAtActivitiesByLookingBackwardInRoute(this));
             addActivityVisitor(new UpdateMaxCapacityUtilisationAtActivitiesByLookingForwardInRoute(this));
             addActivityVisitor(new UpdateMaxCapacityUtilisationAtRoute(this));
+        }
+    }
+
+    /**
+     * @author Ayman
+     * Update state of charge state
+     *
+     */
+    public void updateStateOfChargeStates(){
+        if(!updateStateOfCharge) {
+            // TODO: add related updaters
+
+            updateStateOfCharge = true;
         }
     }
 

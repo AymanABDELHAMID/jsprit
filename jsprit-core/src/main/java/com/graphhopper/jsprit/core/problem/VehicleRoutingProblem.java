@@ -726,7 +726,7 @@ public class VehicleRoutingProblem {
 
     /**
          * Returns energy consumption costs.
-         *
+         * // TODO : change name to get energy costs
          * @return energyConsumption
          * @see VehicleRoutingEnergyCosts
          */

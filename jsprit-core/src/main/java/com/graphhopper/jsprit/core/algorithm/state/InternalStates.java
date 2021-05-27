@@ -52,4 +52,11 @@ public class InternalStates {
     public static final StateId EARLIEST_WITHOUT_WAITING = new StateFactory.StateIdImpl("earliest_without_waiting", 14);
 
     public static final StateId SWITCH_NOT_FEASIBLE = new StateFactory.StateIdImpl("switch_not_feasible", 15);
+
+    /**
+     * @author Ayman
+     * Adding Internal States of the state of charge
+     */
+    public static final StateId STATE_OF_CHARGE_AT_BEGINNING = new StateFactory.StateIdImpl("state_of_charge_at_beginning", 16);
+    public static final StateId STATE_OF_CHARGE_AT_END = new StateFactory.StateIdImpl("state_of_charge_at_end", 17);
 }

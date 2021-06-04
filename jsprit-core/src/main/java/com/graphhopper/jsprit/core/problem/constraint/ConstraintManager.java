@@ -173,6 +173,9 @@ public class ConstraintManager implements HardActivityConstraint, HardRouteConst
 
     public void addEnergyConsumptionConstraint() {
         if(!energyConsumptionConstraintSet){
+            /**
+             * constraint 1 : energy consumption activity
+             */
             energyConsumptionConstraintSet = true;
         }
     }

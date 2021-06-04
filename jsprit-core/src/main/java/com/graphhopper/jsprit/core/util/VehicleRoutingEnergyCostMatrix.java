@@ -2,6 +2,7 @@ package com.graphhopper.jsprit.core.util;
 
 import com.graphhopper.jsprit.core.problem.cost.AbstractForwardVehicleEnergyTransportCost;
 import com.graphhopper.jsprit.core.problem.Location;
+import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,6 +167,13 @@ public class VehicleRoutingEnergyCostMatrix extends AbstractForwardVehicleEnergy
         }
     }
 
+    @Override
+    public double getBackwardEnergyCost(Location from, Location to, double arrivalTime, Driver driver, Vehicle vehicle) {
+        return super.getBackwardEnergyCost(from, to, arrivalTime, driver, vehicle);
+    }
 
-
+    @Override
+    public double getEnergyCost(Location from, Location to, double departureTime, Driver driver, Vehicle vehicle) {
+        return 0;
+    }
 }

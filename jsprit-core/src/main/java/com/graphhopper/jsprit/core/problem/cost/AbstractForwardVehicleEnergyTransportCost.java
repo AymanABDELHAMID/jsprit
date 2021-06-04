@@ -9,4 +9,11 @@ public abstract class AbstractForwardVehicleEnergyTransportCost  implements  Veh
     @Override
     public abstract double getEnergyConsumption(Location from, Location to, Vehicle vehicle);
 
+    @Override
+    public double getBackwardEnergyCost(Location from, Location to, double arrivalTime, Driver driver, Vehicle vehicle) {
+        return getEnergyCost(from, to, arrivalTime, driver, vehicle);
+    }
+
+    @Override
+    public abstract double getEnergyCost(Location from, Location to, double departureTime, Driver driver, Vehicle vehicle);
 }

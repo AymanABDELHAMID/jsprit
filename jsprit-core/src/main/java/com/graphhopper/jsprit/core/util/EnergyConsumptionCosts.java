@@ -73,4 +73,14 @@ public class EnergyConsumptionCosts extends AbstractForwardVehicleEnergyTranspor
             throw new NullPointerException("cannot calculate euclidean distance. coordinates are missing. either add coordinates or use another transport-cost-calculator.");
         }
     }
+
+    @Override
+    public double getBackwardEnergyCost(Location from, Location to, double arrivalTime, Driver driver, Vehicle vehicle) {
+        return super.getBackwardEnergyCost(from, to, arrivalTime, driver, vehicle);
+    }
+
+    @Override
+    public double getEnergyCost(Location from, Location to, double departureTime, Driver driver, Vehicle vehicle) {
+        return 0;
+    }
 }

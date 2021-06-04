@@ -81,6 +81,18 @@ public class EnergyConsumptionCosts extends AbstractForwardVehicleEnergyTranspor
 
     @Override
     public double getEnergyCost(Location from, Location to, double departureTime, Driver driver, Vehicle vehicle) {
-        return 0;
+        double consumption;
+        try {
+            consumption = calculateConsumptionConstant(from, to);
+        } catch (NullPointerException e) {
+            throw new NullPointerException("cannot calculate consumption. coordinates are missing. either add coordinates or use another transport-cost-calculator.");
+        }
+        double costs = consumption;
+        if (vehicle != null) {
+            if (vehicle.getType() != null) {
+                costs = consumption * vehicle.getType().getVehicleCostParams().perEnergyUnit_Battery;
+            }
+        }
+        return costs;
     }
 }

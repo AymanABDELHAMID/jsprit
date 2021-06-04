@@ -94,10 +94,11 @@ public class UpdateVariableCosts implements ActivityVisitor, StateUpdater {
         timeTracker.visit(act);
 
         double transportCost = this.transportCost.getTransportCost(prevAct.getLocation(), act.getLocation(), startTimeAtPrevAct, vehicleRoute.getDriver(), vehicleRoute.getVehicle());
-        double energyCost = this.energyCost.g
+        double energyCost = this.energyCost.getEnergyCost(prevAct.getLocation(),act.getLocation(), startTimeAtPrevAct, vehicleRoute.getDriver(), vehicleRoute.getVehicle());
         double actCost = activityCost.getActivityCost(act, timeTracker.getActArrTime(), vehicleRoute.getDriver(), vehicleRoute.getVehicle());
 
         totalOperationCost += transportCost;
+        totalOperationCost += energyCost;
         totalOperationCost += actCost;
 
         states.putInternalTypedActivityState(act, InternalStates.COSTS, totalOperationCost);

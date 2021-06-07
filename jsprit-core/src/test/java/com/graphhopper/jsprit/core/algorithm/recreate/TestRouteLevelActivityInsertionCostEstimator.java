@@ -24,6 +24,7 @@ import com.graphhopper.jsprit.core.problem.JobActivityFactory;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingEnergyCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.job.Job;
@@ -59,6 +60,8 @@ public class TestRouteLevelActivityInsertionCostEstimator {
 
     private VehicleRoutingActivityCosts activityCosts;
 
+    private VehicleRoutingEnergyCosts energyCosts;
+
     private StateManager stateManager;
 
     @Before
@@ -78,6 +81,13 @@ public class TestRouteLevelActivityInsertionCostEstimator {
             }
 
         };
+
+        /**
+         * @author: Ayman
+         * using CostFactory previously created constant energy consumption costs
+         */
+        energyCosts = CostFactory.createConstantEnergyCosts();
+
         Service s1 = Service.Builder.newInstance("s1").setLocation(Location.newInstance("10,0")).setTimeWindow(TimeWindow.newInstance(10., 10.)).build();
         Service s2 = Service.Builder.newInstance("s2").setLocation(Location.newInstance("20,0")).setTimeWindow(TimeWindow.newInstance(20., 20.)).build();
         Service s3 = Service.Builder.newInstance("s3").setLocation(Location.newInstance("30,0")).setTimeWindow(TimeWindow.newInstance(30., 30.)).build();
@@ -106,7 +116,7 @@ public class TestRouteLevelActivityInsertionCostEstimator {
         }).addService(s1).addService(s2).addService(s3).build();
 
         stateManager = new StateManager(vrp);
-        stateManager.addStateUpdater(new UpdateVariableCosts(activityCosts, routingCosts, stateManager));
+        stateManager.addStateUpdater(new UpdateVariableCosts(activityCosts, routingCosts, energyCosts, stateManager));
         stateManager.informInsertionStarts(Arrays.asList(route), Collections.<Job>emptyList());
     }
 

@@ -117,7 +117,7 @@ public class TestCalculatesServiceInsertionOnRouteLevel {
         states = new StateManager(vrp);
         states.updateLoadStates();
         states.updateTimeWindowStates();
-        states.addStateUpdater(new UpdateVariableCosts(vrp.getActivityCosts(), vrp.getTransportCosts(), states));
+        states.addStateUpdater(new UpdateVariableCosts(vrp.getActivityCosts(), vrp.getTransportCosts(),  vrp.getEnergyConsumption(), states));
 
         ConstraintManager cManager = new ConstraintManager(vrp, states);
         cManager.addLoadConstraint();

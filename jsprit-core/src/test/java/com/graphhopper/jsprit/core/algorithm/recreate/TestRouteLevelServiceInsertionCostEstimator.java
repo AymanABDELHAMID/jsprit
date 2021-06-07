@@ -25,6 +25,7 @@ import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingEnergyCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.job.Job;
@@ -60,6 +61,8 @@ public class TestRouteLevelServiceInsertionCostEstimator {
 
     private VehicleRoutingActivityCosts activityCosts;
 
+    private VehicleRoutingEnergyCosts energyCosts;
+
     private StateManager stateManager;
 
     private ConstraintManager constraintManager;
@@ -89,6 +92,9 @@ public class TestRouteLevelServiceInsertionCostEstimator {
 
         };
         vrpBuilder.setActivityCosts(activityCosts);
+
+        energyCosts = CostFactory.createConstantEnergyCosts();
+        vrpBuilder.setEnergyCost(energyCosts);
 
         Service s1 = Service.Builder.newInstance("s1").setLocation(Location.newInstance("10,0")).setTimeWindow(TimeWindow.newInstance(10., 10.)).build();
         Service s2 = Service.Builder.newInstance("s2").setLocation(Location.newInstance("20,0")).setTimeWindow(TimeWindow.newInstance(20., 20.)).build();
@@ -120,7 +126,7 @@ public class TestRouteLevelServiceInsertionCostEstimator {
         VehicleRoutingProblem vrpMock = mock(VehicleRoutingProblem.class);
         when(vrpMock.getFleetSize()).thenReturn(VehicleRoutingProblem.FleetSize.INFINITE);
         stateManager = new StateManager(vrpMock);
-        stateManager.addStateUpdater(new UpdateVariableCosts(activityCosts, routingCosts, stateManager));
+        stateManager.addStateUpdater(new UpdateVariableCosts(activityCosts, routingCosts, energyCosts, stateManager));
         stateManager.informInsertionStarts(Arrays.asList(route), Collections.<Job>emptyList());
         constraintManager = new ConstraintManager(vrp, stateManager);
     }

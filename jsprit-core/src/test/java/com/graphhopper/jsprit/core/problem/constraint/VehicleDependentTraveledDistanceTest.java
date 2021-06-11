@@ -100,7 +100,7 @@ public class VehicleDependentTraveledDistanceTest {
 
         traveledDistanceId = stateManager.createStateId("traveledDistance");
 
-        VehicleDependentTraveledDistance traveledDistance =
+        VehicleDependentTraveledDistance traveledDistance = // TODO: find usgaes
             new VehicleDependentTraveledDistance(vrp.getTransportCosts(), stateManager, traveledDistanceId, Arrays.asList(vehicle, vehicle2));
 
         stateManager.addStateUpdater(traveledDistance);
@@ -173,7 +173,7 @@ vehicle2 (max distance): 180.0
     }
 
     @Test
-    public void traveledDistanceShouldBeCorrect() {
+    public void traveledDistanceShouldBeCorrect() { // this is for the first vehicle
         Assert.assertEquals(20d, stateManager.getActivityState(route.getActivities().get(0), vehicle, traveledDistanceId, Double.class), 0.01);
         Assert.assertEquals(35d, stateManager.getActivityState(route.getActivities().get(1), vehicle, traveledDistanceId, Double.class), 0.01);
         Assert.assertEquals(65d, stateManager.getActivityState(route.getActivities().get(2), vehicle, traveledDistanceId, Double.class), 0.01);

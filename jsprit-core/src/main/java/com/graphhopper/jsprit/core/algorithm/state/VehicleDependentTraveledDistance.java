@@ -81,6 +81,7 @@ public class VehicleDependentTraveledDistance implements StateUpdater, ActivityV
                 uniqueVehicles.add(v);
             }
         }
+
         return uniqueVehicles;
     }
 

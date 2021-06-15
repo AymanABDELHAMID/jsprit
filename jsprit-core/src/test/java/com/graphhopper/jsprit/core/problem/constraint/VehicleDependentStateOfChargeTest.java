@@ -4,6 +4,7 @@ import com.graphhopper.jsprit.core.algorithm.state.StateId;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.algorithm.state.VehicleDependentStateOfCharge;
 import com.graphhopper.jsprit.core.algorithm.state.VehicleDependentTraveledDistance;
+import com.graphhopper.jsprit.core.problem.Capacity;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.cost.TransportConsumption;
@@ -24,6 +25,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class VehicleDependentStateOfChargeTest {
 
@@ -93,10 +98,18 @@ public class VehicleDependentStateOfChargeTest {
     }
 
     @Test
+    public void whenCreatingAVehicleDependentActivityState_itShouldBeMemorized() {
+        stateManager.putActivityState(route.getActivities().get(2), vehicle, stateOfChargeId, 50d);
+        double getConsumption = stateManager.getActivityState(route.getActivities().get(2), vehicle, stateOfChargeId, Double.class);
+        Assert.assertEquals(50d, getConsumption, 0.01);
+    }
+
+    @Test
     public void energyConsumptionOfShipmentInRoute() {
         double stateOfChargeBeforePickup = stateManager.getActivityState(route.getActivities().get(2), vehicle, stateOfChargeId, Double.class);
         double stateOfChargeBeforeDelivery = stateManager.getActivityState(route.getActivities().get(4), vehicle, stateOfChargeId, Double.class);
         double energyConsumptionPickupDelivery = stateOfChargeBeforeDelivery - stateOfChargeBeforePickup;
         Assert.assertEquals(90d, energyConsumptionPickupDelivery, 0.01);
     }
+
 }

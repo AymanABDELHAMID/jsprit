@@ -3,6 +3,10 @@ package com.graphhopper.jsprit.core.problem.constraint;
 import com.graphhopper.jsprit.core.algorithm.state.StateId;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.algorithm.state.StateUpdater;
+import com.graphhopper.jsprit.core.algorithm.state.VehicleDependentStateOfCharge;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.cost.TransportConsumption;
+import com.graphhopper.jsprit.core.problem.cost.TransportDistance;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
@@ -10,11 +14,14 @@ import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.ActivityVisitor;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.solution.route.state.RouteAndActivityStateGetter;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.util.VehicleRoutingEnergyCostMatrix;
 import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -31,91 +38,55 @@ import java.util.Map;
 
 public class EnergyConsumptionActivityLevelConstraint implements HardActivityConstraint {
 
-    private final Map<String, VehicleTypeImpl> vehicleTypes;
-    // check : https://github.com/matsim-org/matsim-libs/blob/c8cb872afa98de1f72e87cb35b199db2ab0ddeca/contribs/freight/src/main/java/org/matsim/contrib/freight/carrier/CarrierVehicleTypes.java#L15
-    private final VehicleRoutingEnergyCostMatrix energyCostMatrix;
+    private RouteAndActivityStateGetter stateManager; // TODO: Make sure you don't need the actual state manager
 
-    public EnergyConsumptionActivityLevelConstraint(Map<String, VehicleTypeImpl> vehicleTypes, RouteAndActivityStateGetter states, VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts, StateManager stateManager, VehicleRoutingTransportCostsMatrix costsMatrix, VehicleRoutingEnergyCostMatrix energyCostMatrix, double maxDistance, StateId distanceStateId) {
-        this.vehicleTypes = vehicleTypes;
-        this.states = states;
-        this.routingCosts = routingCosts;
-        this.activityCosts = activityCosts;
+    //private StateId stateOfChargeId;
+
+    private TransportConsumption consumptionCalculator;
+
+    private Double[] maxConsumptions;
+
+    private VehicleRoutingProblem vrp;
+
+    /**
+     * This replaces the DistanceUpdater
+     */
+    //VehicleDependentStateOfCharge stateOfCharge =
+     //   new VehicleDependentStateOfCharge(vrp.getEnergyConsumption(), stateManager, stateOfChargeId, vrp.getVehicles());
+
+    public EnergyConsumptionActivityLevelConstraint(RouteAndActivityStateGetter stateManager, VehicleRoutingProblem vrp) {
         this.stateManager = stateManager;
-        this.costsMatrix = costsMatrix;
-        this.energyCostMatrix = energyCostMatrix;
-        this.maxDistance = maxDistance;
-        this.distanceStateId = distanceStateId;
+        this.consumptionCalculator = vrp.getEnergyConsumption();
+        this.maxConsumptions = maxConsumptions;
+        Map<Vehicle, Double> consumptionMap = new HashMap<>();
+        for (Vehicle v : vrp.getVehicles()) {
+            this.maxConsumptions[v.getIndex()] = v.getType().getBatteryDimensions().getRange(0);} // Assuming the vehicle has one battery for now
+        makeArray(consumptionMap);
+        this.vrp = vrp;
     }
 
-    static class DistanceUpdater implements StateUpdater, ActivityVisitor {
-
-        private final StateManager stateManager;
-
-        private final VehicleRoutingTransportCostsMatrix costMatrix;
-        private final VehicleRoutingEnergyCostMatrix energyCostMatrix;
-
-
-        //        private final StateFactory.StateId distanceStateId;    //v1.3.1
-        private final StateId distanceStateId; //head of development - upcoming release
-
-        private VehicleRoute vehicleRoute;
-
-        private double distance = 0.;
-
-        private TourActivity prevAct;
-
-
-        public DistanceUpdater(StateId distanceStateId, StateManager stateManager, VehicleRoutingTransportCostsMatrix costMatrix, VehicleRoutingEnergyCostMatrix energyCosts) {
-            this.costMatrix = costMatrix;
-            this.energyCostMatrix = energyCosts;
-            this.stateManager = stateManager;
-            this.distanceStateId = distanceStateId;
-        }
-
-        @Override
-        public void begin(VehicleRoute vehicleRoute) {
-            distance = 0.;
-            prevAct = vehicleRoute.getStart();
-            this.vehicleRoute = vehicleRoute;
-        }
-
-        @Override
-        public void visit(TourActivity tourActivity) {
-            distance += getConsumption(prevAct, tourActivity);
-            prevAct = tourActivity;
-        }
-
-        @Override
-        public void finish() {
-            distance += getConsumption(prevAct, vehicleRoute.getEnd());
-            //            stateManager.putTypedRouteState(vehicleRoute,distanceStateId,Double.class,distance); //v1.3.1
-            stateManager.putRouteState(vehicleRoute, distanceStateId, distance); //head of development - upcoming release (v1.4)
-        }
-
-        double getDistance(TourActivity from, TourActivity to) {
-            return costMatrix.getDistance(from.getLocation().getId(), to.getLocation().getId());
-        }
-
-        double getConsumption(TourActivity from, TourActivity to) {
-            return energyCostMatrix.getConsumption(from.getLocation().getId(), to.getLocation().getId());
+    private void makeArray(Map<Vehicle, Double> maxConsumptions) {
+        int maxIndex = getMaxIndex(maxConsumptions.keySet());
+        this.maxConsumptions = new Double[maxIndex + 1];
+        for (Vehicle v : maxConsumptions.keySet()) {
+            this.maxConsumptions[v.getIndex()] = maxConsumptions.get(v);
         }
     }
 
-    private RouteAndActivityStateGetter states;
+    private int getMaxIndex(Collection<Vehicle> vehicles) {
+        int index = 0;
+        for (Vehicle v : vehicles) {
+            if (v.getIndex() > index) index = v.getIndex();
+        }
+        return index;
+    }
 
-    private VehicleRoutingTransportCosts routingCosts;
+    @Override
+    public ConstraintsStatus fulfilled(JobInsertionContext iFacts, TourActivity prevAct, TourActivity newAct, TourActivity nextAct, double prevActDepTime) {
+        return null;
+    }
 
-    private VehicleRoutingActivityCosts activityCosts;
-
-
-    private final StateManager stateManager;
-
-    private final VehicleRoutingTransportCostsMatrix costsMatrix;
-
-    private final double maxDistance;
-
-    private final StateId distanceStateId;
-
+        /*
     @Override
     public ConstraintsStatus fulfilled(JobInsertionContext context, TourActivity prevAct, TourActivity newAct, TourActivity nextAct, double departureTime) {
         double additionalDistance = getConsumption(prevAct, newAct) + getConsumption(newAct, nextAct) - getConsumption(prevAct, nextAct);
@@ -135,7 +106,7 @@ public class EnergyConsumptionActivityLevelConstraint implements HardActivityCon
     double getConsumption(TourActivity from, TourActivity to) {
         return energyCostMatrix.getConsumption(from.getLocation().getId(), to.getLocation().getId());
     }
-
+    /*
 
     /**
      *
@@ -144,8 +115,10 @@ public class EnergyConsumptionActivityLevelConstraint implements HardActivityCon
      * @param costsMatrix
      * @return Distance from point one to point 2
      */
+        /*
     double getDistance(TourActivity from, TourActivity to, VehicleRoutingTransportCostsMatrix costsMatrix) {
         return costsMatrix.getDistance(from.getLocation().getId(), to.getLocation().getId());
     }
+    */
 
 }

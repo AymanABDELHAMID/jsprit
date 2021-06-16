@@ -14,6 +14,6 @@ public class EnergyConsumptionRouteLevelConstraint implements HardRouteConstrain
 
     @Override
     public boolean fulfilled(JobInsertionContext insertionContext) {
-        return false;
+        return true;
     }
 }

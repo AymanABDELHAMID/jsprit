@@ -17,6 +17,7 @@
  */
 package com.graphhopper.jsprit.core.problem.constraint;
 
+import com.graphhopper.jsprit.core.algorithm.state.StateId;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
@@ -176,6 +177,8 @@ public class ConstraintManager implements HardActivityConstraint, HardRouteConst
             /**
              * constraint 1 : energy consumption activity
              */
+            addConstraint(new EnergyConsumptionRouteLevelConstraint());
+            addConstraint(new EnergyConsumptionActivityLevelConstraint(stateManager, vrp), Priority.HIGH); // when activity level constraint is added the Priority must be added as well.
             energyConsumptionConstraintSet = true;
         }
     }

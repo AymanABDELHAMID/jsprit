@@ -100,7 +100,7 @@ public class VehicleDependentTraveledDistanceTest {
 
         traveledDistanceId = stateManager.createStateId("traveledDistance");
 
-        VehicleDependentTraveledDistance traveledDistance = // TODO: find usgaes
+        VehicleDependentTraveledDistance traveledDistance = // TODO: find usages
             new VehicleDependentTraveledDistance(vrp.getTransportCosts(), stateManager, traveledDistanceId, Arrays.asList(vehicle, vehicle2));
 
         stateManager.addStateUpdater(traveledDistance);

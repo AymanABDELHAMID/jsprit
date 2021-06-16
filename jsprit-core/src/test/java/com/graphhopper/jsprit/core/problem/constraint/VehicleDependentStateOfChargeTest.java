@@ -3,7 +3,6 @@ package com.graphhopper.jsprit.core.problem.constraint;
 import com.graphhopper.jsprit.core.algorithm.state.StateId;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.algorithm.state.VehicleDependentStateOfCharge;
-import com.graphhopper.jsprit.core.algorithm.state.VehicleDependentTraveledDistance;
 import com.graphhopper.jsprit.core.problem.Capacity;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
@@ -16,6 +15,7 @@ import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
+import com.graphhopper.jsprit.core.util.EnergyConsumptionCosts;
 import com.graphhopper.jsprit.core.util.ManhattanCosts;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,10 +25,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class VehicleDependentStateOfChargeTest {
 
@@ -71,7 +67,7 @@ public class VehicleDependentStateOfChargeTest {
         newDelivery = Delivery.Builder.newInstance("new").setLocation(Location.newInstance(-10, 10)).build();
 
         vrp = VehicleRoutingProblem.Builder.newInstance()
-            .setRoutingCost(new ManhattanCosts()).addVehicle(vehicle).addVehicle(vehicle2)
+            .setRoutingCost(new ManhattanCosts()).setEnergyCost(new EnergyConsumptionCosts()).addVehicle(vehicle).addVehicle(vehicle2)
             .addJob(d1).addJob(d2).addJob(s1).addJob(pickup).addJob(newDelivery).build();
 
         route = VehicleRoute.Builder.newInstance(vehicle).setJobActivityFactory(vrp.getJobActivityFactory())
@@ -79,7 +75,6 @@ public class VehicleDependentStateOfChargeTest {
 
         stateManager = new StateManager(vrp);
 
-        //traveledDistanceId = stateManager.createStateId("traveledDistance");
         stateOfChargeId = stateManager.createStateId("stateOfCharge");
 
         VehicleDependentStateOfCharge stateOfCharge =

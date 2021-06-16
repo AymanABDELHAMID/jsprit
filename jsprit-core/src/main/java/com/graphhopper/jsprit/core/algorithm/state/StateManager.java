@@ -642,10 +642,11 @@ public class StateManager implements RouteAndActivityStateGetter, IterationStart
      */
     public void updateStateOfChargeStates(){
         if(!updateStateOfCharge) {
-            // TODO: add related updaters
             updateStateOfCharge = true;
-            UpdateStateOfCharge updateStateOfCharge = new UpdateStateOfCharge(this);
-            // VehicleDependentStateOfCharge vehicleDependentStateOfCharge = new VehicleDependentStateOfCharge(this.vrp.getEnergyConsumption(),this,);
+            // UpdateStateOfCharge updateStateOfCharge = new UpdateStateOfCharge(this);
+            VehicleDependentStateOfCharge vehicleDependentStateOfCharge = new VehicleDependentStateOfCharge(this.vrp.getEnergyConsumption(),this, this.createStateId("stateOfCharge"), this.vrp.getVehicles());
+            addActivityVisitor(vehicleDependentStateOfCharge);
+            addListener(vehicleDependentStateOfCharge);
         }
     }
 

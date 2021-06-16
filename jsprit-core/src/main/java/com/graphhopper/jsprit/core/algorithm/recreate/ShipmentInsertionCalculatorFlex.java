@@ -24,6 +24,7 @@ import com.graphhopper.jsprit.core.problem.constraint.HardConstraint;
 import com.graphhopper.jsprit.core.problem.constraint.SoftActivityConstraint;
 import com.graphhopper.jsprit.core.problem.constraint.SoftRouteConstraint;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingEnergyCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.job.Job;
@@ -61,6 +62,8 @@ public final class ShipmentInsertionCalculatorFlex extends AbstractInsertionCalc
 
     private VehicleRoutingTransportCosts transportCosts;
 
+    private VehicleRoutingEnergyCosts energyCosts;
+
     private VehicleRoutingActivityCosts activityCosts;
 
     private JobActivityFactory activityFactory;
@@ -78,13 +81,14 @@ public final class ShipmentInsertionCalculatorFlex extends AbstractInsertionCalc
         this.evalIndexDelivery = evalIndexDelivery;
     }
 
-    public ShipmentInsertionCalculatorFlex(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts, ActivityInsertionCostsCalculator activityInsertionCostsCalculator, ConstraintManager constraintManager) {
+    public ShipmentInsertionCalculatorFlex(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts, VehicleRoutingEnergyCosts energyCosts, ActivityInsertionCostsCalculator activityInsertionCostsCalculator, ConstraintManager constraintManager) {
         super();
         this.activityInsertionCostsCalculator = activityInsertionCostsCalculator;
         this.constraintManager = constraintManager;
         this.softActivityConstraint = constraintManager;
         this.softRouteConstraint = constraintManager;
         this.transportCosts = routingCosts;
+        this.energyCosts = energyCosts;
         this.activityCosts = activityCosts;
         additionalAccessEgressCalculator = new AdditionalAccessEgressCalculator(routingCosts);
         logger.debug("initialise {}", this);

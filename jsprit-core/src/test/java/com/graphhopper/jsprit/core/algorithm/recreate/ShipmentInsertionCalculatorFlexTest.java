@@ -28,6 +28,7 @@ import com.graphhopper.jsprit.core.problem.constraint.HardRouteConstraint;
 import com.graphhopper.jsprit.core.problem.constraint.PickupAndDeliverShipmentLoadActivityLevelConstraint;
 import com.graphhopper.jsprit.core.problem.constraint.ShipmentPickupsFirstConstraint;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingEnergyCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.driver.DriverImpl;
@@ -63,6 +64,7 @@ import static org.mockito.Mockito.when;
 public class ShipmentInsertionCalculatorFlexTest {
 
     VehicleRoutingTransportCosts routingCosts;
+    VehicleRoutingEnergyCosts energyCosts;
 
     VehicleRoutingProblem vehicleRoutingProblem;
 
@@ -100,6 +102,7 @@ public class ShipmentInsertionCalculatorFlexTest {
     @Before
     public void doBefore() {
         routingCosts = CostFactory.createManhattanCosts();
+        energyCosts = CostFactory.createConstantEnergyCosts();
         VehicleType type = VehicleTypeImpl.Builder.newInstance("t").addCapacityDimension(0, 2).setCostPerDistance(1).build();
         vehicle = VehicleImpl.Builder.newInstance("v").setStartLocation(Location.newInstance("0,0")).setType(type).build();
         activityInsertionCostsCalculator = new LocalActivityInsertionCostsCalculator(routingCosts, activityCosts, mock(StateManager.class));
@@ -123,7 +126,7 @@ public class ShipmentInsertionCalculatorFlexTest {
         activities.add(new PickupShipment(shipment));
         activities.add(new DeliverShipment(shipment));
         when(activityFactory.createActivities(shipment)).thenReturn(activities);
-        insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts, activityInsertionCostsCalculator, constraintManager);
+        insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts, energyCosts, activityInsertionCostsCalculator, constraintManager);
         insertionCalculator.setJobActivityFactory(activityFactory);
         InsertionData iData = insertionCalculator.getInsertionData(route, shipment, vehicle, 0.0, null, Double.MAX_VALUE);
         assertEquals(40.0, iData.getInsertionCost(), 0.05);
@@ -142,7 +145,7 @@ public class ShipmentInsertionCalculatorFlexTest {
         activities.add(new PickupShipment(shipment2));
         activities.add(new DeliverShipment(shipment2));
         when(activityFactory.createActivities(shipment2)).thenReturn(activities);
-        insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts, activityInsertionCostsCalculator, constraintManager);
+        insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts, energyCosts, activityInsertionCostsCalculator, constraintManager);
         insertionCalculator.setJobActivityFactory(activityFactory);
 
         InsertionData iData = insertionCalculator.getInsertionData(route, shipment2, vehicle, 0.0, null, Double.MAX_VALUE);
@@ -183,7 +186,7 @@ public class ShipmentInsertionCalculatorFlexTest {
         activities.add(new PickupShipment(shipment2));
         activities.add(new DeliverShipment(shipment2));
         when(activityFactory.createActivities(shipment2)).thenReturn(activities);
-        insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts, activityInsertionCostsCalculator, constraintManager);
+        insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts, energyCosts, activityInsertionCostsCalculator, constraintManager);
         insertionCalculator.setJobActivityFactory(activityFactory);
 
         InsertionData iData = insertionCalculator.getInsertionData(route, shipment2, vehicle, 0.0, null, Double.MAX_VALUE);
@@ -210,7 +213,7 @@ public class ShipmentInsertionCalculatorFlexTest {
         activities.add(new PickupShipment(shipment3));
         activities.add(new DeliverShipment(shipment3));
         when(activityFactory.createActivities(shipment3)).thenReturn(activities);
-        insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts, activityInsertionCostsCalculator, constraintManager);
+        insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts, energyCosts, activityInsertionCostsCalculator, constraintManager);
         insertionCalculator.setJobActivityFactory(activityFactory);
 
         InsertionData iData = insertionCalculator.getInsertionData(route, shipment3, vehicle, 0.0, null, Double.MAX_VALUE);
@@ -236,7 +239,7 @@ public class ShipmentInsertionCalculatorFlexTest {
         activities.add(new PickupShipment(shipment3));
         activities.add(new DeliverShipment(shipment3));
         when(activityFactory.createActivities(shipment3)).thenReturn(activities);
-        insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts, activityInsertionCostsCalculator, constraintManager);
+        insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts, energyCosts, activityInsertionCostsCalculator, constraintManager);
         insertionCalculator.setJobActivityFactory(activityFactory);
 
 
@@ -271,7 +274,7 @@ public class ShipmentInsertionCalculatorFlexTest {
         constraintManager.addConstraint(new ShipmentPickupsFirstConstraint(), ConstraintManager.Priority.CRITICAL);
 
         ShipmentInsertionCalculatorFlex insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts,
-            activityInsertionCostsCalculator, constraintManager);
+            energyCosts, activityInsertionCostsCalculator, constraintManager);
         insertionCalculator.setJobActivityFactory(vrp.getJobActivityFactory());
 
         InsertionData iData = insertionCalculator.getInsertionData(route, shipment3, vehicle, 0.0, DriverImpl.noDriver(), Double.MAX_VALUE);
@@ -304,7 +307,7 @@ public class ShipmentInsertionCalculatorFlexTest {
         constraintManager.addConstraint(new PickupAndDeliverShipmentLoadActivityLevelConstraint(stateManager), ConstraintManager.Priority.CRITICAL);
 //        constraintManager.addConstraint(new ShipmentPickupsFirstConstraint(), ConstraintManager.Priority.CRITICAL);
 
-        ShipmentInsertionCalculatorFlex insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts,
+        ShipmentInsertionCalculatorFlex insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts, energyCosts,
             activityInsertionCostsCalculator, constraintManager);
         insertionCalculator.setEvalIndexPickup(0);
         insertionCalculator.setEvalIndexDelivery(3);
@@ -349,8 +352,8 @@ public class ShipmentInsertionCalculatorFlexTest {
         when(activityFactory.createActivities(service)).thenReturn(activities);
 
         JobCalculatorSwitcher switcher = new JobCalculatorSwitcher();
-        ServiceInsertionCalculator serviceInsertionCalc = new ServiceInsertionCalculator(routingCosts, activityCosts, activityInsertionCostsCalculator, constraintManager, activityFactory);
-        ShipmentInsertionCalculatorFlex insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts, activityInsertionCostsCalculator, constraintManager);
+        ServiceInsertionCalculator serviceInsertionCalc = new ServiceInsertionCalculator(routingCosts, activityCosts, energyCosts, activityInsertionCostsCalculator, constraintManager, activityFactory);
+        ShipmentInsertionCalculatorFlex insertionCalculator = new ShipmentInsertionCalculatorFlex(routingCosts, activityCosts, energyCosts, activityInsertionCostsCalculator, constraintManager);
         insertionCalculator.setJobActivityFactory(activityFactory);
         switcher.put(Pickup.class, serviceInsertionCalc);
         switcher.put(Service.class, serviceInsertionCalc);

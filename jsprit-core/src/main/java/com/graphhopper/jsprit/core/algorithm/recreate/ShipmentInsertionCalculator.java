@@ -24,6 +24,7 @@ import com.graphhopper.jsprit.core.problem.constraint.HardConstraint;
 import com.graphhopper.jsprit.core.problem.constraint.SoftActivityConstraint;
 import com.graphhopper.jsprit.core.problem.constraint.SoftRouteConstraint;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingEnergyCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.job.Job;
@@ -57,19 +58,26 @@ final class ShipmentInsertionCalculator extends AbstractInsertionCalculator {
 
     private final VehicleRoutingTransportCosts transportCosts;
 
+    /**
+     * @author: Ayman
+     * Energy Consumption Costs added to the shimpment insertion calculator
+     */
+    private final VehicleRoutingEnergyCosts energyCosts;
+
     private final VehicleRoutingActivityCosts activityCosts;
 
     private final JobActivityFactory activityFactory;
 
     private final AdditionalAccessEgressCalculator additionalAccessEgressCalculator;
 
-    public ShipmentInsertionCalculator(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts, ActivityInsertionCostsCalculator activityInsertionCostsCalculator, ConstraintManager constraintManager, JobActivityFactory jobActivityFactory) {
+    public ShipmentInsertionCalculator(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts, VehicleRoutingEnergyCosts energyCosts, ActivityInsertionCostsCalculator activityInsertionCostsCalculator, ConstraintManager constraintManager, JobActivityFactory jobActivityFactory) {
         super();
         this.activityInsertionCostsCalculator = activityInsertionCostsCalculator;
         this.constraintManager = constraintManager;
         this.softActivityConstraint = constraintManager;
         this.softRouteConstraint = constraintManager;
         this.transportCosts = routingCosts;
+        this.energyCosts = energyCosts;
         this.activityCosts = activityCosts;
         additionalAccessEgressCalculator = new AdditionalAccessEgressCalculator(routingCosts);
         this.activityFactory = jobActivityFactory;

@@ -25,6 +25,7 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 import com.graphhopper.jsprit.core.problem.cost.AbstractForwardVehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingEnergyCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.driver.DriverImpl;
@@ -37,10 +38,7 @@ import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
-import com.graphhopper.jsprit.core.util.Coordinate;
-import com.graphhopper.jsprit.core.util.EuclideanDistanceCalculator;
-import com.graphhopper.jsprit.core.util.Locations;
-import com.graphhopper.jsprit.core.util.ManhattanDistanceCalculator;
+import com.graphhopper.jsprit.core.util.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -55,6 +53,7 @@ public class TestCalculatesServiceInsertion {
     ServiceInsertionCalculator serviceInsertion;
 
     VehicleRoutingTransportCosts costs;
+    VehicleRoutingEnergyCosts energyCosts;
 
     VehicleImpl vehicle;
 
@@ -112,6 +111,11 @@ public class TestCalculatesServiceInsertion {
             }
         };
 
+        /**
+         * not going to be used here most probably
+         */
+        energyCosts = CostFactory.createConstantEnergyCosts();
+
 
         first = Service.Builder.newInstance("1").addSizeDimension(0, 0).setLocation(Location.newInstance("0,10")).setTimeWindow(TimeWindow.newInstance(0.0, 100.0)).build();
         second = Service.Builder.newInstance("2").addSizeDimension(0, 0).setLocation(Location.newInstance("10,10")).setTimeWindow(TimeWindow.newInstance(0.0, 100.0)).build();
@@ -136,7 +140,7 @@ public class TestCalculatesServiceInsertion {
 
         VehicleRoutingActivityCosts actCosts = mock(VehicleRoutingActivityCosts.class);
 
-        serviceInsertion = new ServiceInsertionCalculator(costs, vrp.getActivityCosts(), new LocalActivityInsertionCostsCalculator(costs, actCosts, states), cManager, new JobActivityFactory() {
+        serviceInsertion = new ServiceInsertionCalculator(costs, vrp.getActivityCosts(), energyCosts, new LocalActivityInsertionCostsCalculator(costs, actCosts, states), cManager, new JobActivityFactory() {
             @Override
             public List<AbstractActivity> createActivities(Job job) {
                 return vrp.copyAndGetActivities(job);

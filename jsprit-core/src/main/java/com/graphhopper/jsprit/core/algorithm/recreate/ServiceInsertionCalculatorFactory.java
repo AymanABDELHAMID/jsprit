@@ -25,6 +25,6 @@ import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 public class ServiceInsertionCalculatorFactory implements JobInsertionCostsCalculatorFactory {
     @Override
     public JobInsertionCostsCalculator create(VehicleRoutingProblem vrp, ActivityInsertionCostsCalculator activityInsertionCostsCalculator, JobActivityFactory jobActivityFactory, ConstraintManager constraintManager) {
-        return new ServiceInsertionCalculator(vrp.getTransportCosts(), vrp.getActivityCosts(), activityInsertionCostsCalculator, constraintManager, jobActivityFactory);
+        return new ServiceInsertionCalculator(vrp.getTransportCosts(), vrp.getActivityCosts(), vrp.getEnergyConsumption(), activityInsertionCostsCalculator, constraintManager, jobActivityFactory);
     }
 }

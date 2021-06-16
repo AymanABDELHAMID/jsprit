@@ -24,6 +24,7 @@ import com.graphhopper.jsprit.core.problem.constraint.HardConstraint;
 import com.graphhopper.jsprit.core.problem.constraint.SoftActivityConstraint;
 import com.graphhopper.jsprit.core.problem.constraint.SoftRouteConstraint;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingEnergyCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.job.Job;
@@ -58,6 +59,12 @@ final class ServiceInsertionCalculator extends AbstractInsertionCalculator {
 
     private final VehicleRoutingTransportCosts transportCosts;
 
+    /**
+     * @author: Ayman
+     * Energy Consumption Costs added to the insertion calculator
+     */
+    private final VehicleRoutingEnergyCosts energyCosts;
+
     private final VehicleRoutingActivityCosts activityCosts;
 
     private final ActivityInsertionCostsCalculator activityInsertionCostsCalculator;
@@ -68,9 +75,10 @@ final class ServiceInsertionCalculator extends AbstractInsertionCalculator {
 
     private final ConstraintManager constraintManager;
 
-    public ServiceInsertionCalculator(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts, ActivityInsertionCostsCalculator activityInsertionCostsCalculator, ConstraintManager constraintManager, JobActivityFactory activityFactory) {
+    public ServiceInsertionCalculator(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts,  VehicleRoutingEnergyCosts energyCosts, ActivityInsertionCostsCalculator activityInsertionCostsCalculator, ConstraintManager constraintManager, JobActivityFactory activityFactory) {
         super();
         this.transportCosts = routingCosts;
+        this.energyCosts = energyCosts;
         this.activityCosts = activityCosts;
         this.constraintManager = constraintManager;
         softActivityConstraint = constraintManager;

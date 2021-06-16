@@ -1,21 +1,5 @@
-/*
- * Licensed to GraphHopper GmbH under one or more contributor
- * license agreements. See the NOTICE file distributed with this work for
- * additional information regarding copyright ownership.
- *
- * GraphHopper GmbH licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.graphhopper.jsprit.core.algorithm.recreate;
+
 
 import com.graphhopper.jsprit.core.algorithm.recreate.listener.InsertionListeners;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
@@ -53,11 +37,13 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
+/**
+ * @author: Ayman
+ */
 
-public class ServiceInsertionAndLoadConstraintsTest {
 
+public class ServiceInsertionAndStateOfChargeTest {
     VehicleRoutingTransportCosts routingCosts;
-
     VehicleRoutingEnergyCosts energyCosts;
 
     VehicleRoutingActivityCosts activityCosts = new VehicleRoutingActivityCosts() {
@@ -102,8 +88,8 @@ public class ServiceInsertionAndLoadConstraintsTest {
     @Before
     public void doBefore() {
         routingCosts = CostFactory.createManhattanCosts();
-        energyCosts = CostFactory.createConstantEnergyCosts(); // TODO : Maybe you'll have to change it to manhattan costs but for the energy.
-        VehicleType type = VehicleTypeImpl.Builder.newInstance("t").addCapacityDimension(0, 2).setCostPerDistance(1).build();
+        energyCosts = CostFactory.createConstantEnergyCosts();
+        VehicleType type = VehicleTypeImpl.Builder.newInstance("t").addCapacityDimension(0, 200).addBatteryDimension(0, 500).setCostPerDistance(1).build();
         vehicle = VehicleImpl.Builder.newInstance("v").setStartLocation(Location.newInstance("0,0")).setType(type).build();
         activityInsertionCostsCalculator = new LocalActivityInsertionCostsCalculator(routingCosts, activityCosts, mock(StateManager.class));
         createInsertionCalculator(hardRouteLevelConstraint);
@@ -117,11 +103,11 @@ public class ServiceInsertionAndLoadConstraintsTest {
     }
 
     @Test
-    public void whenInsertingServiceWhileNoCapIsAvailable_itMustReturnTheCorrectInsertionIndex() {
+    public void whenInsertingServiceWhileNoRangeIsAvailable_itMustReturnTheCorrectInsertionIndex() {
         Delivery delivery = (Delivery) Delivery.Builder.newInstance("del").addSizeDimension(0, 41).setLocation(Location.newInstance("10,10")).build();
         Pickup pickup = (Pickup) Pickup.Builder.newInstance("pick").addSizeDimension(0, 15).setLocation(Location.newInstance("0,10")).build();
 
-        VehicleType type = VehicleTypeImpl.Builder.newInstance("t").addCapacityDimension(0, 50).setCostPerDistance(1).build();
+        VehicleType type = VehicleTypeImpl.Builder.newInstance("t").addCapacityDimension(0, 50).addBatteryDimension(0, 500).setCostPerDistance(1).build();
         VehicleImpl vehicle = VehicleImpl.Builder.newInstance("v").setStartLocation(Location.newInstance("0,0")).setType(type).build();
 
         final VehicleRoutingProblem vrp = VehicleRoutingProblem.Builder.newInstance().addJob(delivery).addJob(pickup).addVehicle(vehicle).build();
@@ -140,10 +126,10 @@ public class ServiceInsertionAndLoadConstraintsTest {
         };
 
         StateManager stateManager = new StateManager(vrp);
-        stateManager.updateLoadStates();
+        stateManager.updateStateOfChargeStates();
 
         ConstraintManager constraintManager = new ConstraintManager(vrp, stateManager);
-        constraintManager.addLoadConstraint();
+        constraintManager.addEnergyConsumptionConstraint();
         stateManager.informInsertionStarts(Arrays.asList(route), null);
 
         JobCalculatorSwitcher switcher = new JobCalculatorSwitcher();
@@ -159,5 +145,6 @@ public class ServiceInsertionAndLoadConstraintsTest {
 
         assertEquals(1, iData.getDeliveryInsertionIndex());
     }
+
 
 }

@@ -54,23 +54,21 @@ public class EnergyConsumptionActivityLevelConstraint implements HardActivityCon
     //VehicleDependentStateOfCharge stateOfCharge =
      //   new VehicleDependentStateOfCharge(vrp.getEnergyConsumption(), stateManager, stateOfChargeId, vrp.getVehicles());
 
-    public EnergyConsumptionActivityLevelConstraint(RouteAndActivityStateGetter stateManager, VehicleRoutingProblem vrp) {
+    public EnergyConsumptionActivityLevelConstraint(RouteAndActivityStateGetter stateManager, VehicleRoutingProblem vrp) { // Why did we use RouteAndActivityStateGetter??
         this.stateManager = stateManager;
         this.consumptionCalculator = vrp.getEnergyConsumption();
-        this.maxConsumptions = maxConsumptions;
         Map<Vehicle, Double> consumptionMap = new HashMap<>();
-        for (Vehicle v : vrp.getVehicles()) {
-            this.maxConsumptions[v.getIndex()] = v.getType().getBatteryDimensions().getRange(0);} // Assuming the vehicle has one battery for now
         makeArray(consumptionMap);
-        this.vrp = vrp;
+        this.vrp = vrp; // in testing I found out this is null..
     }
 
     private void makeArray(Map<Vehicle, Double> maxConsumptions) {
         int maxIndex = getMaxIndex(maxConsumptions.keySet());
         this.maxConsumptions = new Double[maxIndex + 1];
-        for (Vehicle v : maxConsumptions.keySet()) {
-            this.maxConsumptions[v.getIndex()] = maxConsumptions.get(v);
-        }
+        for (Vehicle v :  vrp.getVehicles()) {
+            this.maxConsumptions[v.getIndex()] = v.getType().getBatteryDimensions().getRange(0);} // Assuming the vehicle has one battery for now
+            //this.maxConsumptions[v.getIndex()] = maxConsumptions.get(v);
+        // TODO: change to get state of charge in the updater. This means the range should be updated
     }
 
     private int getMaxIndex(Collection<Vehicle> vehicles) {

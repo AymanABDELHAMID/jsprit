@@ -119,6 +119,7 @@ public class VehicleDependentStateOfCharge  implements StateUpdater, ActivityVis
         BatteryAM energyCostAtEnd = BatteryAM.Builder.newInstance().build();
         for (Job j : route.getTourActivities().getJobs()) {
             double energyConsumption;
+            // 21.06 getting an error here: states might not be initialized.
             VehicleDependentStateOfCharge.State old = states.get(route);
             energyConsumption = EnergyConsumptionCalculator.calculateConsumption(old.getPrevLocation().getCoordinate(), j.getActivities().get(0).getLocation().getCoordinate(),
                 route.getVehicle().getType(), j.getActivities().get(0).getLocation().getLoad());

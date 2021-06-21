@@ -31,8 +31,7 @@ import com.graphhopper.jsprit.core.util.CostFactory;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -129,8 +128,17 @@ public class ServiceInsertionAndStateOfChargeTest {
         stateManager.updateStateOfChargeStates();
 
         ConstraintManager constraintManager = new ConstraintManager(vrp, stateManager);
-        constraintManager.addEnergyConsumptionConstraint();
-        stateManager.informInsertionStarts(Arrays.asList(route), null);
+        /**
+         * @author: Ayman
+         * Note: if I understand correctly, the consumption map should be constructed here.
+         * The consumption map should then be updated with "update consumption map" - or with using
+         */
+        Map<Vehicle, Double> consumptionMap;
+        consumptionMap = CreateMaxDistanceMap(vrp);
+        constraintManager.addEnergyConsumptionConstraint(stateManager, consumptionMap);
+
+        // Tested until here
+        stateManager.informInsertionStarts(Arrays.asList(route), Collections.<Job>emptyList());
 
         JobCalculatorSwitcher switcher = new JobCalculatorSwitcher();
         ServiceInsertionCalculator serviceInsertionCalc = new ServiceInsertionCalculator(routingCosts, activityCosts, energyCosts, activityInsertionCostsCalculator, constraintManager, activityFactory);
@@ -146,5 +154,19 @@ public class ServiceInsertionAndStateOfChargeTest {
         assertEquals(1, iData.getDeliveryInsertionIndex());
     }
 
+    /**
+     * This method constructs the initial maximum consumption map
+     * @param vrp
+     * @return
+     */
+    public Map<Vehicle, Double> CreateMaxDistanceMap(VehicleRoutingProblem vrp){
+        Collection<Vehicle> vehicles = vrp.getVehicles();
+        Map<Vehicle, Double> consumptionMap = new HashMap<>();
+        for (Vehicle v :  vehicles) {
+            double stateOfCharge = v.getType().getBatteryDimensions().get(0); // Assuming vehicles have only one battery
+            consumptionMap.put(v, stateOfCharge);
+        }
+        return consumptionMap;
+    }
 
 }

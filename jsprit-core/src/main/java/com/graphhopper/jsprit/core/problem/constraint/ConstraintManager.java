@@ -18,18 +18,17 @@
 package com.graphhopper.jsprit.core.problem.constraint;
 
 import com.graphhopper.jsprit.core.algorithm.state.StateId;
+import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.solution.route.state.RouteAndActivityStateGetter;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Manager that manage hard- and soft constraints, both on route and activity level.
@@ -172,13 +171,16 @@ public class ConstraintManager implements HardActivityConstraint, HardRouteConst
      * @author: Ayman M.
      */
 
-    public void addEnergyConsumptionConstraint() {
+    public void addEnergyConsumptionConstraint(StateManager stateManager, Map<Vehicle, Double> consumptionMap) {
         if(!energyConsumptionConstraintSet){
             /**
              * constraint 1 : energy consumption activity
              */
             addConstraint(new EnergyConsumptionRouteLevelConstraint());
-            addConstraint(new EnergyConsumptionActivityLevelConstraint(stateManager, vrp), Priority.HIGH); // when activity level constraint is added the Priority must be added as well.
+            // addConstraint(new EnergyConsumptionActivityLevelConstraint(stateManager, vrp), Priority.HIGH); // when activity level constraint is added the Priority must be added as well.
+            //StateManager stateManager = new StateManager(vrp); // Warning : Parallel State Managers
+            StateId stateOfCharge = stateManager.createStateId("stateOfCharge");
+            addConstraint(new EnergyConsumptionActivityLevelConstraint(stateManager, stateOfCharge, consumptionMap, vrp), Priority.HIGH); // testing with a new StateManager
             energyConsumptionConstraintSet = true;
         }
     }

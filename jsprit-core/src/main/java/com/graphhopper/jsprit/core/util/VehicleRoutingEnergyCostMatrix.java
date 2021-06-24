@@ -148,6 +148,11 @@ public class VehicleRoutingEnergyCostMatrix extends AbstractForwardVehicleEnergy
         return getConsumption(from.getId(), to.getId());
     }
 
+    @Override
+    public double getEnergyConsumption(Location from, Location to) {
+        return getConsumption(from.getId(), to.getId());
+    }
+
     public double getConsumption(String fromId, String toId) {
         if (fromId.equals(toId)) return 0.0;
         if (!consumptionsSet) return 0.0;

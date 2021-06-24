@@ -1,20 +1,15 @@
 package com.graphhopper.jsprit.core.algorithm.state;
 
-import com.graphhopper.jsprit.core.algorithm.recreate.listener.InsertionStartsListener;
-import com.graphhopper.jsprit.core.algorithm.recreate.listener.JobInsertedListener;
-import com.graphhopper.jsprit.core.problem.BatteryAM;
+
 import com.graphhopper.jsprit.core.problem.Location;
-import com.graphhopper.jsprit.core.problem.job.Delivery;
-import com.graphhopper.jsprit.core.problem.job.Job;
-import com.graphhopper.jsprit.core.problem.job.Pickup;
-import com.graphhopper.jsprit.core.problem.job.Service;
+import com.graphhopper.jsprit.core.problem.cost.TransportConsumption;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.ActivityVisitor;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
-import com.graphhopper.jsprit.core.util.EnergyConsumptionCalculator;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeKey;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Ayman
@@ -23,92 +18,93 @@ import java.util.Map;
  * or a job has been inserted.
  */
 
-public class UpdateStateOfCharge implements ActivityVisitor, StateUpdater, InsertionStartsListener, JobInsertedListener {
+public class UpdateStateOfCharge implements ActivityVisitor, StateUpdater {
 
-
-    private StateManager stateManager;
-
-    /*
-     * default has one dimension with a value of zero
-     */
-    private BatteryAM currentStateOfCharge;
-
-    private BatteryAM defaultValue;
-
-    private VehicleRoute route;
 
     static class State {
 
         Location prevLocation;
 
-        public State(Location prevLocation) {
+        double consumption;
+
+        public State(Location prevLocation, double consumption) {
             this.prevLocation = prevLocation;
+
+            this.consumption = consumption;
         }
 
         public Location getPrevLocation() {
             return prevLocation;
         }
+
+        public double getConsumption() {
+            return consumption;
+        }
     }
 
+    private final TransportConsumption transportConsumption;
 
-    private Map<VehicleRoute, State> states;
+    private final StateManager stateManager;
 
-    public UpdateStateOfCharge(StateManager stateManager){
-        // I have seen VRP used everywhere in the state manager.
+    private final StateId stateOfChargeId;
+
+    private VehicleRoute route;
+
+    private List<Vehicle> uniqueVehicles;
+
+    private Map<VehicleTypeKey, State> states;
+
+    public UpdateStateOfCharge(TransportConsumption transportConsumption, StateManager stateManager, StateId stateOfChargeId, Collection<Vehicle> vehicles) {
+        this.transportConsumption = transportConsumption;
         this.stateManager = stateManager;
-        this.defaultValue = BatteryAM.Builder.newInstance().build(); // in this builder the state of charge should be full by default.
+        this.stateOfChargeId = stateOfChargeId;
+        this.uniqueVehicles = getUniqueVehicles(vehicles);;
     }
 
-    void insertionStarts(VehicleRoute route) {
-        BatteryAM energyCostAtDepot = BatteryAM.Builder.newInstance().build();
-        BatteryAM energyCostAtEnd = BatteryAM.Builder.newInstance().build();
-        for (Job j : route.getTourActivities().getJobs()) {
-            /**
-             * Calculating the consumption at the job
-             */
-            double energyConsumption;
-            UpdateStateOfCharge.State old = states.get(route);
-            energyConsumption = EnergyConsumptionCalculator.calculateConsumption(old.getPrevLocation().getCoordinate(), j.getActivities().get(0).getLocation().getCoordinate(),
-                route.getVehicle().getType(), j.getActivities().get(0).getLocation().getLoad());
-            // TODO : ask why there is a list of activities for every job and how to get around that
-            // TODO : getLoad from Job
-            BatteryAM consumptionCost = BatteryAM.Builder.newInstance().addDimension(0,energyConsumption).build();
-            if (j instanceof Delivery) {
-                energyCostAtDepot = BatteryAM.subtractRange(energyCostAtDepot, consumptionCost);
-            } else if (j instanceof Pickup || j instanceof Service) {
-                energyCostAtEnd = BatteryAM.subtractRange(energyCostAtEnd, consumptionCost);
+    private List<Vehicle> getUniqueVehicles(Collection<Vehicle> vehicles) {
+        Set<VehicleTypeKey> types = new HashSet<>();
+        List<Vehicle> uniqueVehicles = new ArrayList<>();
+        for (Vehicle v : vehicles) {
+            if (!types.contains(v.getVehicleTypeIdentifier())) {
+                types.add(v.getVehicleTypeIdentifier());
+                uniqueVehicles.add(v);
             }
         }
-        stateManager.putTypedInternalRouteState(route, InternalStates.STATE_OF_CHARGE_AT_BEGINNING, energyCostAtDepot);
-        stateManager.putTypedInternalRouteState(route, InternalStates.STATE_OF_CHARGE_AT_END, energyCostAtEnd);
-    }
 
-    @Override
-    public void informInsertionStarts(Collection<VehicleRoute> vehicleRoutes, Collection<Job> unassignedJobs) {
-
-    }
-
-    @Override
-    public void informJobInserted(Job job2insert, VehicleRoute inRoute, double additionalCosts, double additionalTime) {
-
+        return uniqueVehicles;
     }
 
     @Override
     public void begin(VehicleRoute route) {
-        currentStateOfCharge = stateManager.getRouteState(route, InternalStates.STATE_OF_CHARGE_AT_BEGINNING, BatteryAM.class);
-        if (currentStateOfCharge == null) currentStateOfCharge = defaultValue;
         this.route = route;
+        states = new HashMap<>();
+        for (Vehicle v : uniqueVehicles) {
+            // Start with zero consumption, it should start with vehicle fully charged
+            State state = new State(v.getStartLocation(), 0);
+            states.put(v.getVehicleTypeIdentifier(), state);
+        }
     }
 
     @Override
     public void visit(TourActivity activity) {
-        //State old = states.get(v.getVehicleTypeIdentifier());
-        //currentStateOfCharge = BatteryAM.subtractRange(currentStateOfCharge);
-        //stateManager.putInternalTypedActivityState(act, InternalStates.LOAD, currentLoad);
+        for (Vehicle v : uniqueVehicles) {
+            State old = states.get(v.getVehicleTypeIdentifier());
+            double consumption = old.getConsumption();
+            consumption += transportConsumption.getEnergyConsumption(old.getPrevLocation(), activity.getLocation(), v);
+            stateManager.putActivityState(activity, v, stateOfChargeId, consumption);
+            states.put(v.getVehicleTypeIdentifier(), new State(activity.getLocation(), consumption));
+        }
     }
 
     @Override
     public void finish() {
-
+        for (Vehicle v : uniqueVehicles) {
+            State old = states.get(v.getVehicleTypeIdentifier());
+            double consumption = old.getConsumption();
+            if (v.isReturnToDepot()) {
+                consumption += transportConsumption.getEnergyConsumption(old.getPrevLocation(), v.getEndLocation(), v);
+            }
+            stateManager.putRouteState(route, v, stateOfChargeId, consumption);
+        }
     }
 }

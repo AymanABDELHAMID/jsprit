@@ -202,7 +202,12 @@ public class VehicleTypeImpl implements VehicleType {
          */
         private String profile_name = "car";
 
-        private VehicleProfile profile = VehicleProfile.Builder.newInstance(profile_name).build(); //VehicleProfile.newInstance(profile_name); // TODO: fix the error
+        /**
+         * @author Ayman
+         * 24.06 adding default values to profile
+         */
+
+        private VehicleProfile profile = VehicleProfile.Builder.newInstance(profile_name).build();
 
         private Capacity.Builder capacityBuilder = Capacity.Builder.newInstance();
 

@@ -20,6 +20,7 @@ public class EnergyConsumptionCosts extends AbstractForwardVehicleEnergyTranspor
 
     @Override
     public double getEnergyConsumption(Location from, Location to, Vehicle vehicle){
+        // this should be the getEnrgyCost and NOT Consumption
         double energy = calculateConsumption(from, to, vehicle.getType(), from.getLoad());
         if (vehicle != null && vehicle.getType() != null) { // TODO: add energy_type
             if (vehicle.getType().getEnergyType() == 1) {
@@ -34,6 +35,13 @@ public class EnergyConsumptionCosts extends AbstractForwardVehicleEnergyTranspor
         return energy;
     }
 
+    @Override
+    public double getEnergyConsumption(Location from, Location to) {
+        return calculateConsumptionDefault(from.getCoordinate(), to.getCoordinate());
+
+    }
+
+    // TODO : Clear things between getting energy costs and getting energy consumption
     double calculateConsumption(Location from, Location to, VehicleType type, double load) {
         return calculateConsumption(from.getCoordinate(), to.getCoordinate(), type, load);
     }
@@ -62,6 +70,19 @@ public class EnergyConsumptionCosts extends AbstractForwardVehicleEnergyTranspor
         }
     }
 
+    double calculateConsumptionDefault(Location fromLocation, Location toLocation) {
+        return calculateConsumptionDefault(fromLocation.getCoordinate(), toLocation.getCoordinate());
+    }
+
+
+    double calculateConsumptionDefault(Coordinate from, Coordinate to) {
+        try {
+            return EnergyConsumptionCalculator.calculateConsumptionDefault(from, to) * detourFactor;
+        } catch (NullPointerException e) {
+            throw new NullPointerException("Coordinates are Missing");
+        }
+    }
+
     double calculateDistance(Location fromLocation, Location toLocation) {
         return calculateDistance(fromLocation.getCoordinate(), toLocation.getCoordinate());
     }
@@ -83,7 +104,7 @@ public class EnergyConsumptionCosts extends AbstractForwardVehicleEnergyTranspor
     public double getEnergyCost(Location from, Location to, double departureTime, Driver driver, Vehicle vehicle) {
         double consumption;
         try {
-            consumption = calculateConsumptionConstant(from, to);
+            consumption = calculateConsumptionDefault(from, to);
         } catch (NullPointerException e) {
             throw new NullPointerException("cannot calculate consumption. coordinates are missing. either add coordinates or use another transport-cost-calculator.");
         }

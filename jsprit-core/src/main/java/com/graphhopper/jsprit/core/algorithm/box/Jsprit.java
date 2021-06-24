@@ -460,7 +460,7 @@ public class Jsprit {
             constraintManager.addConstraint(noiseMaker);
             noiseConfigurator = noiseMaker;
         }
-
+        // Initialisation RUIN
         RuinRadial radial = new RuinRadial(vrp, vrp.getJobs().size(), jobNeighborhoods);
         radial.setRandom(random);
         radial.setRuinShareFactory(new RuinShareFactoryImpl(
@@ -506,7 +506,9 @@ public class Jsprit {
                 toInteger(properties.getProperty(Parameter.WORST_MAX_SHARE.toString())),
                 random)
         );
-
+        /*
+            Add here any initialisation for Ruin
+         */
         int kMin = toInteger(properties.getProperty(Parameter.STRING_K_MIN.toString()));
         int kMax = toInteger(properties.getProperty(Parameter.STRING_K_MAX.toString()));
         int lMin = toInteger(properties.getProperty(Parameter.STRING_L_MIN.toString()));
@@ -516,6 +518,8 @@ public class Jsprit {
         stringRuin.setNoRoutes(kMin, kMax);
         stringRuin.setStringLength(lMin, lMax);
         stringRuin.setRandom(random);
+
+        // Initialiser le Abstract Insertion Strategy
 
         AbstractInsertionStrategy regret;
         final ScoringFunction scorer;
@@ -597,6 +601,7 @@ public class Jsprit {
         }
         best.setRandom(random);
 
+        // Threshold Accepting Method in Schrimpf et al. 2000
         IterationStartsListener schrimpfThreshold = null;
         if(acceptor == null) {
             final SchrimpfAcceptance schrimpfAcceptance = new SchrimpfAcceptance(1, toDouble(getProperty(Parameter.THRESHOLD_ALPHA.toString())));
@@ -644,6 +649,7 @@ public class Jsprit {
         SearchStrategy stringBest = new SearchStrategy(Strategy.STRING_BEST.toString(), new SelectBest(), acceptor, objectiveFunction);
         stringBest.addModule(configureModule(new RuinAndRecreateModule(Strategy.STRING_BEST.toString(), best, stringRuin)));
 
+        // C'est là où le vra commence
         PrettyAlgorithmBuilder prettyBuilder = PrettyAlgorithmBuilder.newInstance(vrp, vehicleFleetManager, stateManager, constraintManager);
         prettyBuilder.setRandom(random);
         if (addCoreConstraints) {

@@ -11,4 +11,6 @@ import com.graphhopper.jsprit.core.problem.driver.Driver;
 public interface TransportConsumption extends ForwardEnergyCost, BackwardEnergyCost {
 
    public double getEnergyConsumption(Location from, Location to, Vehicle vehicle);
+
+   public double getEnergyConsumption(Location from, Location to);
 }

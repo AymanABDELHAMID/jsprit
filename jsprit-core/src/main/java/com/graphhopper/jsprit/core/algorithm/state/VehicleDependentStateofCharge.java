@@ -82,12 +82,8 @@ public class VehicleDependentStateOfCharge  implements StateUpdater, ActivityVis
 
     @Override
     public void begin(VehicleRoute route) {
+        // What to do in Begin?
         this.route = route;
-        states = new HashMap<>();
-        for (Vehicle v : uniqueVehicles) {
-            VehicleDependentStateOfCharge.State state = new VehicleDependentStateOfCharge.State(v.getStartLocation(), 0);
-            states.put(v.getVehicleTypeIdentifier(), state);
-        }
     }
 
     @Override
@@ -119,7 +115,6 @@ public class VehicleDependentStateOfCharge  implements StateUpdater, ActivityVis
         BatteryAM energyCostAtEnd = BatteryAM.Builder.newInstance().build();
         for (Job j : route.getTourActivities().getJobs()) {
             double energyConsumption;
-            // 21.06 getting an error here: states might not be initialized.
             VehicleDependentStateOfCharge.State old = states.get(route);
             energyConsumption = EnergyConsumptionCalculator.calculateConsumption(old.getPrevLocation().getCoordinate(), j.getActivities().get(0).getLocation().getCoordinate(),
                 route.getVehicle().getType(), j.getActivities().get(0).getLocation().getLoad());
@@ -138,6 +133,17 @@ public class VehicleDependentStateOfCharge  implements StateUpdater, ActivityVis
 
     @Override
     public void informInsertionStarts(Collection<VehicleRoute> vehicleRoutes, Collection<Job> unassignedJobs) {
+        /**
+         * 22.06
+         * Insertion Starts: initialize state
+         * Insertion Starts is called before Begin, should initialize State here then use it in begin.
+         * warning : risk of reinitializing states everytime the
+         */
+        states = new HashMap<>();
+        for (Vehicle v : uniqueVehicles) {
+            VehicleDependentStateOfCharge.State state = new VehicleDependentStateOfCharge.State(v.getStartLocation(), 0);
+            states.put(v.getVehicleTypeIdentifier(), state);
+        }
         for (VehicleRoute route : vehicleRoutes) {
             insertionStarts(route);
         }

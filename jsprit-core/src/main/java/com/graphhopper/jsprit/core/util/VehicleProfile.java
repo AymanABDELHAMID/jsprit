@@ -36,7 +36,10 @@ public class VehicleProfile {
         super();
         this.profile_name = profile_name;
         this.frontalArea = frontalArea;
-        this.weight = weight;
+        if(weight == 0) {
+            this.weight = 1200; // Quick and dirty solution
+        }else {
+            this.weight = weight;}
         this.maxSpeed = maxSpeed;
         this.avgSpeed = avgSpeed;
         this.crr = crr;

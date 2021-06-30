@@ -40,9 +40,10 @@ public class CordeauReaderTest {
     }
 
     private String getPath(String string) {
+        // TODO : find a better fix
         URL resource = this.getClass().getClassLoader().getResource(string);
         if (resource == null) throw new IllegalStateException("resource " + string + " does not exist");
-        return resource.getPath();
+        return resource.getPath().replace("%20", " ");
     }
 
     @Test

@@ -111,15 +111,18 @@ public class GoekeReader implements evrpReader {
         Map<String, Shipment> shipmentMap =  new LinkedHashMap<String, Shipment>();
         Map<String, String> partnerMap =  new LinkedHashMap<String, String>();
         String line;
-        List<List<VehicleImpl.Builder>> vehiclesAtDepot = new ArrayList<List<VehicleImpl.Builder>>();
+        // List<List<VehicleImpl.Builder>> vehiclesAtDepot = new ArrayList<List<VehicleImpl.Builder>>();
+        typeBuilder.setEnergyType(2);
+        VehicleProfile.Builder profileBuilder = VehicleProfile.Builder.newInstance("BEV");
         while (((line = readLine(reader)) != null) && counter <= 500) {
             line = line.replace("\r", "");
             line = line.trim();
             String[] tokens = line.split("\\s+"); // transforms terms in the lines into an array of strings
             if (counter == 0) {
                 // Skipping first line
-                counter++;
-            } else if (counter >= 1) {
+                // counter++;
+                ;
+            } else if (counter >= 1 && tokens.length > 7) {
                 String id = tokens[0].trim();
                 switch (tokens[1]) {
                     case "d":
@@ -143,7 +146,7 @@ public class GoekeReader implements evrpReader {
                         start = Double.parseDouble(tokens[4]) * timeProjectionFactor;
                         end = Double.parseDouble(tokens[5]) * timeProjectionFactor;
                         serviceTime = Double.parseDouble(tokens[3].trim());
-                        demand = Integer.parseInt(tokens[4].trim());
+                        demand = (int)Double.parseDouble(tokens[4].trim());
                         service = Service.Builder.newInstance(id).addSizeDimension(0, demand).setServiceTime(serviceTime)
                             .setLocation(Location.Builder.newInstance().setId(id).setCoordinate(pickupCoord).build()).build();
                         vrpBuilder.addJob(service);
@@ -156,18 +159,20 @@ public class GoekeReader implements evrpReader {
                         start = Double.parseDouble(tokens[4]) * timeProjectionFactor;
                         end = Double.parseDouble(tokens[5]) * timeProjectionFactor;
                         serviceTime = Double.parseDouble(tokens[7].trim());
-                        demand = Integer.parseInt(tokens[4].trim());
+                        demand = (int)Double.parseDouble(tokens[4].trim())*-1;
+                        // remember that this is a delivery
                         service = Service.Builder.newInstance(id).addSizeDimension(0, demand).setServiceTime(serviceTime)
                             .setLocation(Location.Builder.newInstance().setId(id).setCoordinate(deliveryCoord).build()).build();
-                        vrpBuilder.addJob(service);
+                        //vrpBuilder.addJob(service);
                         serviceMap.put(id, service);
                         //partnerMap.put(id, tokens[8]); // not needed since every pickup must have a delivery
                         // TODO: make sure that there are no instances with multiple pickups and one delivery
                         nOfCustomers++;
                         break;
                 }
-            } else if (counter >= (nOfCustomers + nOfRechargeStations + nOfDepots + 1)) {
-                counter++; // skipping the empty line in the middle
+            } else if (counter >= (nOfCustomers + nOfRechargeStations + nOfDepots + 1) && tokens.length <= 1) {
+                //counter++; // skipping the empty line in the middle
+                ;
             }
             else if (counter >= (nOfCustomers + nOfRechargeStations + nOfDepots + 2)) {
                 // TODO : choose consumption calculator based on consumption model in the article
@@ -178,47 +183,46 @@ public class GoekeReader implements evrpReader {
                     inverse recharging rate : 3.47
                     average velocity : 1.0
                  */
-                typeBuilder.setEnergyType(2);
-                VehicleProfile.Builder profileBuilder = VehicleProfile.Builder.newInstance("BEV");
-                switch (counter - (nOfCustomers + nOfRechargeStations + nOfDepots + 2)){
+                switch (counter - (nOfCustomers + nOfRechargeStations + nOfDepots + 1)){
                     case 1:
                         // Battery Range
                         // TODO: change battery dimensions from int to double
-                        typeBuilder.addBatteryDimension(0, Integer.parseInt(tokens[5].trim()));
+                        typeBuilder.addBatteryDimension(0, (int)Double.parseDouble(tokens[4].trim()));
                         break;
                     case 2:
                         // Vehicle cargo capacity
-                        typeBuilder.addCapacityDimension(0,Integer.parseInt(tokens[5].trim()));
+                        typeBuilder.addCapacityDimension(0,(int)Double.parseDouble(tokens[4].trim()));
                         break;
                     case 3:
                         // Vehicle consumption rate
                         // if the consumption rate is (1) then use the consumption model consumption rate
-                        if (Integer.parseInt(tokens[5].trim()) != 1){
-                            profileBuilder.setVehicleNM( Double.parseDouble(tokens[5].trim()));
+                        if ((int)Double.parseDouble(tokens[4].trim()) != 1){
+                            profileBuilder.setVehicleNM( Double.parseDouble(tokens[4].trim()));
                     }
                         break;
                     case 4:
                         // Vehicle recharge rate
-                        profileBuilder.setVehicleNG( Double.parseDouble(tokens[5].trim()));
+                        profileBuilder.setVehicleNG( Double.parseDouble(tokens[4].trim()));
                         break;
                     case 5:
                         // Average velocity here has to do with time windows, it means each time
                         // unit is equivalent to one distance unit.
                         // TODO: ask whether I need to change it in the average velocity in the consumption model
-                        typeBuilder.setAverageVelocity( Double.parseDouble(tokens[5].trim()) );
+                        typeBuilder.setAverageVelocity( Double.parseDouble(tokens[3].trim()) );
                         break;
-                    case 6:
+                    /*case 6:
                         // Finished reading the file
+                        VehicleProfile profile = profileBuilder.build();
+                        typeBuilder.setProfile("BEV").buildProfile(profile);
+                        // breaking the while loop
                         counter = 500;
-                        break;
+                        break; */
                 }
-                VehicleProfile profile = profileBuilder.build();
-                typeBuilder.setProfile("BEV").buildProfile(profile);
-                    // breaking the while loop
-                counter++;
             }
             counter++;
         }
+        VehicleProfile profile = profileBuilder.build();
+        typeBuilder.setProfile("BEV").buildProfile(profile);
         VehicleImpl.Builder vBuilder = VehicleImpl.Builder.newInstance("Goeke-vehicle");
         vBuilder.setStartLocation(Location.newInstance(startLocation.getX(), startLocation.getY()));
         VehicleImpl vehicle = vBuilder.build();

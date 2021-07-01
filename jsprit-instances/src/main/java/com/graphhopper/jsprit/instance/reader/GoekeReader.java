@@ -138,7 +138,7 @@ public class GoekeReader implements evrpReader {
                         start = Double.parseDouble(tokens[4]) * timeProjectionFactor;
                         end = Double.parseDouble(tokens[5]) * timeProjectionFactor;
                         Recharge recharge = Recharge.Builder.newInstance(id).addTimeWindow(start, end).setServiceTime(0d)
-                            .setLocation(Location.Builder.newInstance().setId(id).setCoordinate(rechargeStationCoord).build()).build();
+                            .setLocation(Location.Builder.newInstance().setId(id).setCoordinate(rechargeStationCoord).setLoad(0).build()).build();
                         vrpBuilder.addJob(recharge);
                         nOfRechargeStations++;
                         break;
@@ -230,6 +230,7 @@ public class GoekeReader implements evrpReader {
         typeBuilder.setProfile("BEV").buildProfile(profile);
         VehicleImpl.Builder vBuilder = VehicleImpl.Builder.newInstance("Goeke-vehicle");
         vBuilder.setStartLocation(Location.newInstance(startLocation.getX(), startLocation.getY()));
+        vBuilder.setType(typeBuilder.build());
         VehicleImpl vehicle = vBuilder.build();
         vrpBuilder.addVehicle(vehicle);
         close(reader);

@@ -61,7 +61,7 @@ public class SolomonExampleWithSpecifiedVehicleEndLocationsWithoutTWs {
 		/*
          * Finally, the problem can be built. By default, transportCosts are crowFlyDistances (as usually used for vrp-instances).
 		 */
-//		vrpBuilder.addProblemConstraint(Constraint.DELIVERIES_FIRST);
+//		vrpBuilder.addProblemConstraint(Constraint.DELIVERIES_FIRST); // no idea what is that
         VehicleRoutingProblem vrp = vrpBuilder.build();
 
         Plotter pblmPlotter = new Plotter(vrp);

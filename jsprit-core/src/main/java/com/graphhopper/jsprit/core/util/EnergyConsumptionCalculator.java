@@ -25,7 +25,8 @@ public class EnergyConsumptionCalculator {
         double rho = 1.055;
         double grade = mass*g*Math.sin(slope);
         double rolling = mass*g*Math.cos(slope)*type.getProfile().getCrr();
-        double air = 0.5*rho*type.getProfile().getCw()*type.getProfile().getFrontalArea()*Math.pow(type.getProfile().getAvgSpeed(), 2.);
+        double air = 0.5*rho*type.getProfile().getCw()*type.getProfile().getFrontalArea()
+            *Math.pow(type.getProfile().getAvgSpeed(), 2.);
         double Fr = grade + rolling + air;
         // acceleration is considered to be null
         double d = EuclideanDistanceCalculator.calculateDistance(coord1, coord2);

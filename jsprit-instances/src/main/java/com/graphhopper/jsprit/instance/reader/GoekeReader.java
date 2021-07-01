@@ -5,6 +5,7 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Recharge;
 import com.graphhopper.jsprit.core.problem.job.Service;
 import com.graphhopper.jsprit.core.problem.job.Shipment;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.util.Coordinate;
@@ -142,30 +143,34 @@ public class GoekeReader implements evrpReader {
                         nOfRechargeStations++;
                         break;
                     case "cp":
+                        id = "p"+id;
                         Coordinate pickupCoord = makeCoord(tokens[2].trim(), tokens[3].trim());
-                        start = Double.parseDouble(tokens[4]) * timeProjectionFactor;
-                        end = Double.parseDouble(tokens[5]) * timeProjectionFactor;
+                        start = Double.parseDouble(tokens[5]) * timeProjectionFactor;
+                        end = Double.parseDouble(tokens[6]) * timeProjectionFactor;
                         serviceTime = Double.parseDouble(tokens[3].trim());
                         demand = (int)Double.parseDouble(tokens[4].trim());
                         service = Service.Builder.newInstance(id).addSizeDimension(0, demand).setServiceTime(serviceTime)
+                            .setTimeWindow(TimeWindow.newInstance(start, end))
                             .setLocation(Location.Builder.newInstance().setId(id).setCoordinate(pickupCoord).build()).build();
-                        vrpBuilder.addJob(service);
+                        // vrpBuilder.addJob(service);
                         serviceMap.put(id, service);
-                        partnerMap.put(id, tokens[8]);
+                        partnerMap.put(id, "d"+tokens[8]);
                         nOfCustomers++;
                         break;
                     case "cd":
+                        id = "d"+id;
                         Coordinate deliveryCoord = makeCoord(tokens[2].trim(), tokens[3].trim());
-                        start = Double.parseDouble(tokens[4]) * timeProjectionFactor;
-                        end = Double.parseDouble(tokens[5]) * timeProjectionFactor;
+                        start = Double.parseDouble(tokens[5]) * timeProjectionFactor;
+                        end = Double.parseDouble(tokens[6]) * timeProjectionFactor;
                         serviceTime = Double.parseDouble(tokens[7].trim());
-                        demand = (int)Double.parseDouble(tokens[4].trim())*-1;
+                        demand = (int)Double.parseDouble(tokens[4].trim())*(-1);
                         // remember that this is a delivery
                         service = Service.Builder.newInstance(id).addSizeDimension(0, demand).setServiceTime(serviceTime)
+                            .setTimeWindow(TimeWindow.newInstance(start, end))
                             .setLocation(Location.Builder.newInstance().setId(id).setCoordinate(deliveryCoord).build()).build();
                         //vrpBuilder.addJob(service);
                         serviceMap.put(id, service);
-                        //partnerMap.put(id, tokens[8]); // not needed since every pickup must have a delivery
+                        //partnerMap.put(id, "p"+tokens[8]); // not needed since every pickup must have a delivery
                         // TODO: make sure that there are no instances with multiple pickups and one delivery
                         nOfCustomers++;
                         break;
@@ -229,6 +234,28 @@ public class GoekeReader implements evrpReader {
         vrpBuilder.addVehicle(vehicle);
         close(reader);
         // Building shipments
+        for (Service s : serviceMap.values()) {
+            if (s.getId().startsWith("p")) {
+                // Construct shipment
+                Service sD = serviceMap.get(partnerMap.get(s.getId()));
+                Shipment.Builder builder = Shipment.Builder.newInstance(s.getId() + "-" + sD.getId());
+                // Pickup
+                builder.setPickupLocation(s.getLocation());
+                builder.setPickupServiceTime(s.getServiceDuration());
+                builder.setPickupTimeWindow(s.getTimeWindow());
+                builder.addSizeDimension(0,s.getSize().get(0));
+
+                // Delivery
+                builder.setDeliveryLocation(sD.getLocation());
+                builder.setDeliveryServiceTime(sD.getServiceDuration());
+                builder.setDeliveryTimeWindow(sD.getTimeWindow());
+                // Required Skills
+
+                Shipment shipment = builder.build();
+                shipmentMap.put(shipment.getId(), shipment);
+                vrpBuilder.addJob(shipment);
+            }
+        }
 
     }
 

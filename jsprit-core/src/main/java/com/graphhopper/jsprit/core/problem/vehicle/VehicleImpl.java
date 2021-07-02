@@ -21,6 +21,7 @@ import com.graphhopper.jsprit.core.problem.AbstractVehicle;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.Skills;
 import com.graphhopper.jsprit.core.problem.job.Break;
+import com.graphhopper.jsprit.core.problem.job.Recharge;
 
 import java.util.Collection;
 
@@ -89,6 +90,11 @@ public class VehicleImpl extends AbstractVehicle {
 
         @Override
         public Break getBreak() {
+            return null;
+        }
+
+        @Override
+        public Recharge getRecharge() {
             return null;
         }
 
@@ -436,6 +442,11 @@ public class VehicleImpl extends AbstractVehicle {
     @Override
     public Break getBreak() {
         return aBreak;
+    }
+
+    @Override
+    public Recharge getRecharge() {
+        return null;
     }
 
     /* (non-Javadoc)

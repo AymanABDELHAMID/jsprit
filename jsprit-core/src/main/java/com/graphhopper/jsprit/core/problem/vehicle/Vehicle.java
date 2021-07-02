@@ -22,6 +22,7 @@ import com.graphhopper.jsprit.core.problem.HasIndex;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.Skills;
 import com.graphhopper.jsprit.core.problem.job.Break;
+import com.graphhopper.jsprit.core.problem.job.Recharge;
 
 /**
  * Basic interface for vehicle-data.
@@ -79,6 +80,8 @@ public interface Vehicle extends HasId, HasIndex {
     Object getUserData();
 
     Break getBreak();
+
+    Recharge getRecharge();
     // Switch to this as soon as we switct to Java 8:
     // default Object getUserData() {
     // return null;

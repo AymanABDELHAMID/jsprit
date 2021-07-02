@@ -778,6 +778,12 @@ public class Jsprit {
                         if (act instanceof BreakActivity) hasBreak = true;
                         costs += vrp.getTransportCosts().getTransportCost(prevAct.getLocation(), act.getLocation(), prevAct.getEndTime(), route.getDriver(), route.getVehicle());
                         costs += vrp.getActivityCosts().getActivityCost(act, act.getArrTime(), route.getDriver(), route.getVehicle());
+                        /**
+                         * @author: Ayman M.
+                         * Adding Consumption Costs - this is good for less energy consuming routes, will become interesting when route grade is taken into consideration.
+                         */
+                        costs += vrp.getEnergyConsumption().getEnergyConsumption(prevAct.getLocation(), act.getLocation(), route.getVehicle());
+
                         prevAct = act;
                     }
                     costs += vrp.getTransportCosts().getTransportCost(prevAct.getLocation(), route.getEnd().getLocation(), prevAct.getEndTime(), route.getDriver(), route.getVehicle());
@@ -788,6 +794,9 @@ public class Jsprit {
                                 costs += 4 * (maxCosts * 2 + route.getVehicle().getBreak().getServiceDuration() * route.getVehicle().getType().getVehicleCostParams().perServiceTimeUnit);
                             }
                         }
+                    }
+                    if (route.getVehicle().getRecharge() != null){
+                        ;
                     }
                 }
                 for(Job j : solution.getUnassignedJobs()){

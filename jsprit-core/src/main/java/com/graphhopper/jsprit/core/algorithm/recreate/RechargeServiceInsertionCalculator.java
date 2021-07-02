@@ -45,6 +45,7 @@ public class RechargeServiceInsertionCalculator extends AbstractInsertionCalcula
 
     public RechargeServiceInsertionCalculator(VehicleRoutingTransportCosts routingCosts, VehicleRoutingActivityCosts activityCosts,  VehicleRoutingEnergyCosts energyCosts, ActivityInsertionCostsCalculator activityInsertionCostsCalculator, ConstraintManager constraintManager, JobActivityFactory activityFactory) {
         super();
+        // TODO: ensure there aren't more attributes needed
         this.transportCosts = routingCosts;
         this.energyCosts = energyCosts;
         this.activityCosts = activityCosts;

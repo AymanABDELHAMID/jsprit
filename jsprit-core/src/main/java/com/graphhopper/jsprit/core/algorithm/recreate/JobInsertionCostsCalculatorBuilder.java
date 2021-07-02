@@ -96,6 +96,8 @@ public class JobInsertionCostsCalculatorBuilder {
 
     private JobInsertionCostsCalculatorFactory shipmentCalculatorFactory = new ShipmentInsertionCalculatorFactory();
 
+    private JobInsertionCostsCalculatorFactory rechargeCalculatorFactory = new RechargeInsertionCalculatorFactory();
+
     private JobInsertionCostsCalculatorFactory serviceCalculatorFactory = new ServiceInsertionCalculatorFactory();
 
     private JobInsertionCostsCalculatorFactory breakCalculatorFactory = new BreakInsertionCalculatorFactory();
@@ -111,7 +113,7 @@ public class JobInsertionCostsCalculatorBuilder {
      */
     public JobInsertionCostsCalculatorBuilder(List<InsertionListener> insertionListeners, List<PrioritizedVRAListener> algorithmListeners) {
         super();
-        this.insertionListeners = insertionListeners;
+        this.insertionListeners = insertionListeners; // TODO: Look into insertion listeners in the context of recharge stations
         this.algorithmListeners = algorithmListeners;
     }
 
@@ -314,6 +316,7 @@ public class JobInsertionCostsCalculatorBuilder {
 
         JobInsertionCostsCalculator shipmentInsertion = shipmentCalculatorFactory.create(vrp, actInsertionCalc, activityFactory, constraintManager);
         JobInsertionCostsCalculator serviceInsertion = serviceCalculatorFactory.create(vrp, actInsertionCalc, activityFactory, constraintManager);
+        JobInsertionCostsCalculator rechargeInsertion = rechargeCalculatorFactory.create(vrp, actInsertionCalc, activityFactory, constraintManager);
         JobInsertionCostsCalculator breakInsertion = breakCalculatorFactory.create(vrp, actInsertionCalc, activityFactory, constraintManager);
 
         JobCalculatorSwitcher switcher = new JobCalculatorSwitcher();
@@ -321,6 +324,11 @@ public class JobInsertionCostsCalculatorBuilder {
         switcher.put(Service.class, serviceInsertion);
         switcher.put(Pickup.class, serviceInsertion);
         switcher.put(Delivery.class, serviceInsertion);
+        /**
+         * @Author: Ayman
+         *
+         */
+        switcher.put(Recharge.class, rechargeInsertion);
         switcher.put(Break.class, breakInsertion);
 
         CalculatorPlusListeners calculatorPlusListeners = new CalculatorPlusListeners(switcher);

@@ -2,7 +2,7 @@ package com.graphhopper.jsprit.core.algorithm;
 
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
 import com.graphhopper.jsprit.core.analysis.SolutionAnalyser;
-import com.graphhopper.jsprit.core.problem.Capacity;
+import com.graphhopper.jsprit.core.problem.BatteryAM;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Delivery;
@@ -63,16 +63,15 @@ public class EnergyConsumptionConstraint_IT {
         vra.setMaxIterations(2000);
         VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
 
-
         SolutionAnalyser sa = new SolutionAnalyser(vrp, solution, vrp.getTransportCosts());
 
         for(VehicleRoute r : solution.getRoutes()){
-            Capacity loadAtBeginning = sa.getLoadAtBeginning(r);
-            Capacity capacityDimensions = r.getVehicle().getType().getCapacityDimensions();
-//            System.out.println(r.getVehicle().getId() + " load@beginning: "  + loadAtBeginning);
-//            System.out.println("cap: " + capacityDimensions);
-            Assert.assertTrue("capacity has been exceeded",
-                loadAtBeginning.isLessOrEqual(capacityDimensions));
+            BatteryAM rangeAtBeginning = sa.getStateOfChargeAtBeginning(r);
+            BatteryAM batteryDimensions = r.getVehicle().getType().getBatteryDimensions();
+            System.out.println(r.getVehicle().getId() + " load@beginning: "  + rangeAtBeginning);
+            System.out.println("cap: " + batteryDimensions);
+            Assert.assertTrue("Battery range has been exceeded",
+                rangeAtBeginning.isLessOrEqual(batteryDimensions));
         }
 
     }

@@ -20,6 +20,7 @@ package com.graphhopper.jsprit.core.analysis;
 
 import com.graphhopper.jsprit.core.algorithm.VariablePlusFixedSolutionCostCalculatorFactory;
 import com.graphhopper.jsprit.core.algorithm.state.*;
+import com.graphhopper.jsprit.core.problem.BatteryAM;
 import com.graphhopper.jsprit.core.problem.Capacity;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.cost.TransportDistance;
@@ -639,6 +640,32 @@ public class SolutionAnalyser {
     public Capacity getLoadAtEnd(VehicleRoute route) {
         if (route == null) throw new IllegalArgumentException("route is missing.");
         return stateManager.getRouteState(route, InternalStates.LOAD_AT_END, Capacity.class);
+    }
+
+    /**
+     * 05.07.21
+     * @author Ayman M.
+     * getting route energy consumption data
+     */
+
+    /**
+     *
+     * @param route to get the state of charge at the beginning from
+     * @return State of Charge at beginning of location of specified route
+     */
+    public BatteryAM getStateOfChargeAtBeginning(VehicleRoute route) {
+        if (route == null) throw new IllegalArgumentException("route is missing.");
+        return stateManager.getRouteState(route, InternalStates.STATE_OF_CHARGE_AT_BEGINNING, BatteryAM.class);
+    }
+
+    /**
+     *
+     * @param route to get the state of charge at the end from
+     * @return State of Charge at end of location of specified route
+     */
+    public BatteryAM getStateOfChargeAtEnd(VehicleRoute route) {
+        if (route == null) throw new IllegalArgumentException("route is missing.");
+        return stateManager.getRouteState(route, InternalStates.STATE_OF_CHARGE_AT_BEGINNING, BatteryAM.class);
     }
 
     /**

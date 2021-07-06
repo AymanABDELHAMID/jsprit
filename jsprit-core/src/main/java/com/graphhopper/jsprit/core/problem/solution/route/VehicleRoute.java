@@ -126,6 +126,8 @@ public class VehicleRoute {
 
             private final  TourActivityFactory serviceActivityFactory = new DefaultTourActivityFactory();
 
+            private final  TourActivityFactory rechargeActivityFactory = new DefaultRechargeActivityFactory();
+
             @Override
             public List<AbstractActivity> createActivities(Job job) {
                 List<AbstractActivity> acts = new ArrayList<AbstractActivity>();
@@ -136,6 +138,8 @@ public class VehicleRoute {
                 } else if (job instanceof Shipment) {
                     acts.add(shipmentActivityFactory.createPickup((Shipment) job));
                     acts.add(shipmentActivityFactory.createDelivery((Shipment) job));
+                } else if (job instanceof Recharge) {
+                    acts.add(rechargeActivityFactory.createActivity((Recharge) job));
                 }
                 return acts;
             }
@@ -256,6 +260,26 @@ public class VehicleRoute {
             if (delivery == null) throw new IllegalArgumentException("delivery must not be null");
             return addService(delivery,timeWindow);
         }
+
+        /**
+         * @author Ayman
+         * Adding recharge stations service to the route
+         */
+        public Builder addRecharge(Recharge recharge){
+            if (recharge == null) throw new IllegalArgumentException("recharge must not be null");
+            return addRecharge(recharge, recharge.getTimeWindow());
+        }
+
+        public Builder addRecharge(Recharge recharge, TimeWindow timeWindow){
+            List<AbstractActivity> acts = jobActivityFactory.createActivities(recharge);
+            TourActivity act = acts.get(0);
+            act.setTheoreticalEarliestOperationStartTime(timeWindow.getStart());
+            act.setTheoreticalLatestOperationStartTime(timeWindow.getEnd());
+            tourActivities.addActivity(act);
+            return this;
+        }
+
+
 
         /**
          * Adds a the pickup of the specified shipment.

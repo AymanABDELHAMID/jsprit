@@ -1,6 +1,7 @@
 package com.graphhopper.jsprit.core.problem.job;
 
 public class Recharge extends Service {
+    // TODO: Maybe the extension shouldn't be service.
 
     public static class Builder extends Service.Builder<Recharge> {
 

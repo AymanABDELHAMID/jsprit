@@ -55,7 +55,7 @@ public class BreakExample {
 		 */
         Builder vehicleBuilder = Builder.newInstance("v1");
         vehicleBuilder.setStartLocation(Location.newInstance(10, 10));
-        Break myFirstBreak = Break.Builder.newInstance("myFirstBreak")
+        Break myFirstBreak = Break.Builder.newInstance("myFirstBreak").setLocation(Location.newInstance(25, 13))
             .setTimeWindow(TimeWindow.newInstance(10, 15)).setServiceTime(100).build();
         vehicleBuilder.setBreak(myFirstBreak);
         vehicleBuilder.setType(vehicleType);
@@ -63,7 +63,7 @@ public class BreakExample {
 
 
         VehicleImpl v2 = VehicleImpl.Builder.newInstance("v2").setStartLocation(Location.newInstance(0, 10)).setType(vehicleType)
-            .setBreak((Break) Break.Builder.newInstance("mySecondBreak").setTimeWindow(TimeWindow.newInstance(5, 10)).setServiceTime(10).build()).build();
+            .setBreak((Break) Break.Builder.newInstance("mySecondBreak").setLocation(Location.newInstance(13, 25)).setTimeWindow(TimeWindow.newInstance(5, 10)).setServiceTime(10).build()).build();
 		/*
 		 * build services at the required locations, each with a capacity-demand of 1.
 		 */
@@ -101,7 +101,7 @@ public class BreakExample {
 		/*
 		 * plot
 		 */
-        new Plotter(problem, bestSolution).plot("output/plot", "breaks");
+        new Plotter(problem, bestSolution).plot("output/plot_break_w_locations", "breaks");
 
 
     }

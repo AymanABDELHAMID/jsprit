@@ -1,5 +1,8 @@
 package com.graphhopper.jsprit.core.problem.job;
 
+import com.graphhopper.jsprit.core.problem.Capacity;
+import com.graphhopper.jsprit.core.problem.Skills;
+
 public class Recharge extends Service {
     // TODO: Maybe the extension shouldn't be service.
 
@@ -38,6 +41,12 @@ public class Recharge extends Service {
             if (location == null) throw new IllegalArgumentException("location is missing");
             this.setType("recharge");
             super.battery = super.batteryBuilder.build();
+            /**
+             * There is no capacity but it is needed because it is considered as service
+             * Somewhere in the code it looks for the capacity
+             */
+            super.capacity = Capacity.Builder.newInstance().build();
+            super.skills = Skills.Builder.newInstance().build();
             this.setPriority(2); // TODO: priority cannot be changed
             // TODO : make sure the vehicle type is not required here
             super.activity = new Activity.Builder(location, Activity.Type.RECHARGE).setTimeWindows(timeWindows.getTimeWindows()).setServiceTime(serviceTime).build();

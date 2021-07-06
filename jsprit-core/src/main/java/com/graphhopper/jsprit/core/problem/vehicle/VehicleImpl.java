@@ -24,6 +24,7 @@ import com.graphhopper.jsprit.core.problem.job.Break;
 import com.graphhopper.jsprit.core.problem.job.Recharge;
 
 import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -130,6 +131,8 @@ public class VehicleImpl extends AbstractVehicle {
         private Location endLocation;
 
         private Break aBreak;
+
+        private List<Recharge> tentativeRechargeStations;
 
         private Object userData;
 
@@ -325,6 +328,15 @@ public class VehicleImpl extends AbstractVehicle {
 
         public Builder setBreak(Break aBreak) {
             this.aBreak = aBreak;
+            return this;
+        }
+
+        /**
+         * @Author Ayman
+         * Setting the recharge stations
+         */
+        public Builder setRechargeStations(List<Recharge> rechargeStations) {
+            this.tentativeRechargeStations = rechargeStations;
             return this;
         }
     }

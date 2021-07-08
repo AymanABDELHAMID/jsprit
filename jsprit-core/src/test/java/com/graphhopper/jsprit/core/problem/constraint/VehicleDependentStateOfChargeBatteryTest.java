@@ -71,7 +71,11 @@ public class VehicleDependentStateOfChargeBatteryTest {
         vehicleBuilder.setStartLocation(Location.newInstance(0, 0));
         vehicleBuilder.setType(vehicleType);
         vehicle = vehicleBuilder.build();
-        vehicle2 = VehicleImpl.Builder.newInstance("v2").setStartLocation(Location.newInstance(10, 10)).build();
+
+        VehicleImpl.Builder vehicleBuilder2 = VehicleImpl.Builder.newInstance("v2");
+        vehicleBuilder2.setStartLocation(Location.newInstance(10, 10));
+        vehicleBuilder2.setType(vehicleType);
+        vehicle2 = vehicleBuilder2.build();
 
         d1 = Delivery.Builder.newInstance("d1").setLocation(Location.newInstance(10, 10)).build();
         d2 = Delivery.Builder.newInstance("d2").setLocation(Location.newInstance(20, 15)).build();
@@ -111,7 +115,7 @@ public class VehicleDependentStateOfChargeBatteryTest {
     public void stateOfChargeShouldDecreaseInRoute() {
         BatteryAM stateOfChargeBeforePickup = stateManager.getActivityState(route.getActivities().get(2), vehicle, stateOfChargeId, BatteryAM.class);
         BatteryAM stateOfChargeBeforeDelivery = stateManager.getActivityState(route.getActivities().get(4), vehicle, stateOfChargeId, BatteryAM.class);
-        Assert.assertTrue(stateOfChargeBeforeDelivery.getSoC(0) > stateOfChargeBeforePickup.getSoC(0));
+        Assert.assertTrue(stateOfChargeBeforeDelivery.getSoC(0) >= stateOfChargeBeforePickup.getSoC(0));
     }
 
     @Test

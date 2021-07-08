@@ -110,6 +110,7 @@ public class UpdateStateOfChargeBattery implements ActivityVisitor, StateUpdater
     @Override
     public void visit(TourActivity activity) {
         for (Vehicle v : uniqueVehicles) {
+            // TODO: if act is recharging ...
             State old = states.get(v.getVehicleTypeIdentifier());
             double energyConsumption = transportConsumption.getEnergyConsumption(old.getPrevLocation(), activity.getLocation(), v);
             BatteryAM batteryConsumption = BatteryAM.Builder.newInstance().addDimension(0,energyConsumption).build();

@@ -31,6 +31,8 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl.Builder;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
+import com.graphhopper.jsprit.core.util.EnergyDefaultCosts;
+import com.graphhopper.jsprit.core.util.ManhattanCosts;
 import com.graphhopper.jsprit.core.util.Solutions;
 
 import java.util.Collection;
@@ -76,6 +78,7 @@ public class BreakExample {
 
         VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
         vrpBuilder.addVehicle(vehicle);
+        vrpBuilder.setEnergyCost(new EnergyDefaultCosts()).setRoutingCost(new ManhattanCosts());
         vrpBuilder.addJob(service1).addJob(service2).addJob(service3).addJob(service4).addVehicle(v2);
         vrpBuilder.setFleetSize(VehicleRoutingProblem.FleetSize.FINITE);
         VehicleRoutingProblem problem = vrpBuilder.build();

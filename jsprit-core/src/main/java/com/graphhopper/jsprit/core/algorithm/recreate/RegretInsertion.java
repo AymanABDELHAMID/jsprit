@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * Insertion based on regret approach.
  * <p>
- * <p>Basically calculates the insertion cost of the firstBest and the secondBest alternative. The score is then calculated as difference
+ * <p> Basically calculates the insertion cost of the firstBest and the secondBest alternative. The score is then calculated as difference
  * between secondBest and firstBest, plus additional scoring variables that can defined in this.ScoringFunction.
  * The idea is that if the cost of the secondBest alternative is way higher than the first best, it seems to be important to insert this
  * customer immediatedly. If difference is not that high, it might not impact solution if this customer is inserted later.

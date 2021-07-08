@@ -1,5 +1,6 @@
 package com.graphhopper.jsprit.core.algorithm.recreate;
 
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import org.slf4j.Logger;
@@ -27,5 +28,9 @@ public class eInsertion extends AbstractInsertionStrategy  {
         return null;
     }
 
-
+    public eInsertion(VehicleRoutingProblem vrp, ScoringFunction scoringFunction, JobInsertionCostsCalculator insertionCostsCalculator) {
+        super(vrp);
+        this.scoringFunction = scoringFunction;
+        this.insertionCostsCalculator = insertionCostsCalculator;
+    }
 }

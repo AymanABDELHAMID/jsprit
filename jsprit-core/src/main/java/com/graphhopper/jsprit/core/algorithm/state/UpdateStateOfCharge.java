@@ -1,8 +1,12 @@
 package com.graphhopper.jsprit.core.algorithm.state;
 
 
+import com.graphhopper.jsprit.core.algorithm.recreate.listener.InsertionStartsListener;
+import com.graphhopper.jsprit.core.algorithm.recreate.listener.JobInsertedListener;
+import com.graphhopper.jsprit.core.problem.BatteryAM;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.cost.TransportConsumption;
+import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.ActivityVisitor;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
@@ -13,9 +17,8 @@ import java.util.*;
 
 /**
  * @author Ayman
- * Updates vehicle state of charge at start and end of route as well as at each activity.
- * Update is triggered when either activityVisitor has been started, the insertion process has been started
- * or a job has been inserted.
+ * Updates vehicle total consumption at start and end of route as well as at each activity.
+ * Update is triggered when either activityVisitor has been started.
  */
 
 public class UpdateStateOfCharge implements ActivityVisitor, StateUpdater {
@@ -58,7 +61,7 @@ public class UpdateStateOfCharge implements ActivityVisitor, StateUpdater {
         this.transportConsumption = transportConsumption;
         this.stateManager = stateManager;
         this.stateOfChargeId = stateOfChargeId;
-        this.uniqueVehicles = getUniqueVehicles(vehicles);;
+        this.uniqueVehicles = getUniqueVehicles(vehicles);
     }
 
     private List<Vehicle> getUniqueVehicles(Collection<Vehicle> vehicles) {
@@ -79,7 +82,6 @@ public class UpdateStateOfCharge implements ActivityVisitor, StateUpdater {
         this.route = route;
         states = new HashMap<>();
         for (Vehicle v : uniqueVehicles) {
-            // Start with zero consumption, it should start with vehicle fully charged
             State state = new State(v.getStartLocation(), 0);
             states.put(v.getVehicleTypeIdentifier(), state);
         }

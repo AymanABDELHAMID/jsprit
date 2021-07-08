@@ -47,7 +47,7 @@ public class BatteryAM {
     public static BatteryAM subtractRange(BatteryAM range, BatteryAM range2subtract) {
         if (range == null || range2subtract == null) throw new NullPointerException("arguments must not be null");
         // The next part is redundant but we will leave it here for now
-        if (range.isGreaterOrEqual(range2subtract)) throw new IllegalStateException("The battery range will not fulfill the trip");
+        if (range.isLessOrEqual(range2subtract)) throw new IllegalStateException("The battery range will not fulfill the trip");
         BatteryAM.Builder BatteryAMBuilder = BatteryAM.Builder.newInstance();
         for (int i = 0; i < Math.max(range.getNuOfDimensions(), range2subtract.getNuOfDimensions()); i++) {
             double dimValue = range.get(i) - range2subtract.get(i);

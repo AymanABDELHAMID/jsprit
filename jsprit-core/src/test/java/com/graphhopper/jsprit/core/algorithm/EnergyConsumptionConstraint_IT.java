@@ -1,13 +1,18 @@
 package com.graphhopper.jsprit.core.algorithm;
 
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
+import com.graphhopper.jsprit.core.algorithm.state.StateManager;
+import com.graphhopper.jsprit.core.algorithm.state.StateId;
+import com.graphhopper.jsprit.core.algorithm.state.VehicleDependentStateOfCharge;
 import com.graphhopper.jsprit.core.analysis.SolutionAnalyser;
 import com.graphhopper.jsprit.core.problem.BatteryAM;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 import com.graphhopper.jsprit.core.problem.job.Delivery;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.util.EnergyDefaultCosts;
@@ -15,6 +20,11 @@ import com.graphhopper.jsprit.core.util.ManhattanCosts;
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EnergyConsumptionConstraint_IT {
     @Test
@@ -56,8 +66,22 @@ public class EnergyConsumptionConstraint_IT {
 
         VehicleRoutingProblem vrp = vrpBuilder.build();
 
+        //define stateManager to update the required activity-state: "State_of_Charge_ID"
+        StateManager stateManager = new StateManager(vrp);
+        //create state
+        StateId stateOfChargeID = stateManager.createStateId("stateOfCharge_ID");
+        VehicleDependentStateOfCharge stateOfCharge =
+            new VehicleDependentStateOfCharge(vrp.getEnergyConsumption(), stateManager, stateOfChargeID, Arrays.asList(v1, v2, v3, v4, v5));
+
+        stateManager.addStateUpdater(stateOfCharge);
+
+        ConstraintManager constraintManager = new ConstraintManager(vrp, stateManager);
+        Map<Vehicle, Double> consumptionMap;
+        consumptionMap = CreateMaxDistanceMap(vrp);
+        constraintManager.addEnergyConsumptionConstraint(stateManager, consumptionMap);
+
         VehicleRoutingAlgorithm vra = Jsprit.Builder.newInstance(vrp)
-            .setProperty(Jsprit.Parameter.VEHICLE_SWITCH, "true")
+            .setProperty(Jsprit.Parameter.VEHICLE_SWITCH, "true").setStateAndConstraintManager(stateManager,constraintManager)
             .buildAlgorithm();
         // Activate Range constraints
         vra.setMaxIterations(2000);
@@ -75,4 +99,15 @@ public class EnergyConsumptionConstraint_IT {
         }
 
     }
+    public Map<Vehicle, Double> CreateMaxDistanceMap(VehicleRoutingProblem vrp){
+        Collection<Vehicle> vehicles = vrp.getVehicles();
+        Map<Vehicle, Double> consumptionMap = new HashMap<>();
+        for (Vehicle v :  vehicles) {
+            double stateOfCharge = v.getType().getBatteryDimensions().get(0); // Assuming vehicles have only one battery
+            consumptionMap.put(v, stateOfCharge);
+        }
+        return consumptionMap;
+    }
+
+
 }

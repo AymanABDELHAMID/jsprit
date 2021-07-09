@@ -62,7 +62,7 @@ public class VehicleDependentStateOfChargeBatteryTest {
 
 
         // Building the Vehicle
-        VehicleType vehicleType = vehicleTypeBuilder.build();
+        VehicleType vehicleType = vehicleTypeBuilder.setEnergyType(2).build();
 
         /*
          * get a vehicle-builder and build a vehicle located at (10,10) with type "BEV"

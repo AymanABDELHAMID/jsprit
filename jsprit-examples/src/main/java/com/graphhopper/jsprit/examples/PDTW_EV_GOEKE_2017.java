@@ -71,12 +71,6 @@ public class PDTW_EV_GOEKE_2017 {
         VehicleRoutingAlgorithm vra = Jsprit.createAlgorithm(vrp);
         vra.setMaxIterations(20000);
 
-        /**
-         * Solve the problem.
-         * 01.07.2021
-         * cannot find calculator for class com.graphhopper.jsprit.core.problem.job.Recharge
-         * TODO: build Recharge calculator
-         */
         Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
 
         /*

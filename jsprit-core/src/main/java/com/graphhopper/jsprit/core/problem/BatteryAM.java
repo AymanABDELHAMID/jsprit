@@ -46,7 +46,7 @@ public class BatteryAM {
      */
     public static BatteryAM subtractRange(BatteryAM range, BatteryAM range2subtract) {
         if (range == null || range2subtract == null) throw new NullPointerException("arguments must not be null");
-        // The next part is redundant but we will leave it here for now
+        // TODO : modify here if the range you need to modify will be negative before inserting the charging station.
         if (range.isLessOrEqual(range2subtract)) throw new IllegalStateException("The battery range will not fulfill the trip");
         BatteryAM.Builder BatteryAMBuilder = BatteryAM.Builder.newInstance();
         for (int i = 0; i < Math.max(range.getNuOfDimensions(), range2subtract.getNuOfDimensions()); i++) {
@@ -55,12 +55,7 @@ public class BatteryAM {
         }
         return BatteryAMBuilder.build();
     }
-
-    // TODO: Define maximum Range ()
-    // TODO: Translate Range into SoC and Vice Versa
-
-    // TODO: in the builder add range of a full battery
-    // TODO: Range cannot be negative
+    
 
     /**
      * Makes a deep copy of Capacity.
@@ -84,7 +79,6 @@ public static class Builder {
      * default is 1 dimension with size of zero
      */
     private double[] dimensions = new double[1];
-    // private double maxRange = 500.0;
 
     /**
      * Returns a new instance of BatteryAM with one dimension and a value/size of 0
@@ -96,6 +90,7 @@ public static class Builder {
     }
 
     Builder() {
+
     }
 
     /**
@@ -137,7 +132,7 @@ public static class Builder {
 
 }
     private double[] dimensions;
-    private double maxRange = 500.0;
+    private double[] maxRange;
 
     /**
      * copy constructor
@@ -148,6 +143,7 @@ public static class Builder {
         this.dimensions = new double[batteryAM.getNuOfDimensions()];
         for (int i = 0; i < batteryAM.getNuOfDimensions(); i++) {
             this.dimensions[i] = batteryAM.get(i);
+            this.maxRange[i] = batteryAM.get(i);
         }
     }
 
@@ -173,8 +169,21 @@ public static class Builder {
      * @param index dimension index of the range value to be retrieved
      * @return the according dimension value
      */
-    public double get(int index) { // the index is for the vehicle?
+    public double get(int index) {
         if (index < dimensions.length) return dimensions[index];
+        return 0;
+    }
+
+    /**
+     * Returns value of range-dimension with specified index percentage.
+     * <p>
+     * <p>If range dimension does not exist, it returns 0 (rather than IndexOutOfBoundsException).
+     *
+     * @param index dimension index of the range value to be retrieved
+     * @return the according dimension value
+     */
+    public double getSoCPercentage(int index) {
+        if (index < dimensions.length) return (dimensions[index] / maxRange[index])*100;
         return 0;
     }
 
@@ -187,7 +196,7 @@ public static class Builder {
      * @return the according dimension value
      */
     public double getSoC(int index) {
-        if (index < dimensions.length) return (dimensions[index] / maxRange)*100;
+        if (index < dimensions.length) return dimensions[index];
         return 0;
     }
 
@@ -200,7 +209,7 @@ public static class Builder {
      * @return the according dimension value
      */
     public double getRange(int index) {
-        if (index < dimensions.length) return dimensions[index];
+        if (index < dimensions.length) return maxRange[index];
         return 0;
     }
 
@@ -250,7 +259,7 @@ public static class Builder {
     public String toString() {
         StringBuilder string = new StringBuilder("[noDimensions=" + getNuOfDimensions() + "]");
         for (int i = 0; i < getNuOfDimensions(); i++) {
-            string.append("[[dimIndex=").append(i).append("][Range=").append(dimensions[i]).append("]]");
+            string.append("[[dimIndex=").append(i).append("][Max Range=").append(dimensions[i]).append(" kW]]");
         }
         return string.toString();
     }

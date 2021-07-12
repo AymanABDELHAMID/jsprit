@@ -17,7 +17,6 @@ import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
-import com.graphhopper.jsprit.core.util.EnergyConsumptionCosts;
 import com.graphhopper.jsprit.core.util.EnergyDefaultCosts;
 import com.graphhopper.jsprit.core.util.ManhattanCosts;
 import org.junit.Assert;
@@ -26,8 +25,6 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public class VehicleDependentStateOfChargeBatteryTest {
     StateManager stateManager;
@@ -58,7 +55,7 @@ public class VehicleDependentStateOfChargeBatteryTest {
 
         // .addBatteryDimension(dimensionIndex,range)
         final int BATTERY_INDEX = 0;
-        vehicleTypeBuilder.addBatteryDimension(BATTERY_INDEX, 30000); // Ayman: tested with small range and found no solution
+        vehicleTypeBuilder.addBatteryDimension(BATTERY_INDEX, 60000); // Ayman: tested with small range and found no solution
 
 
         // Building the Vehicle
@@ -67,6 +64,7 @@ public class VehicleDependentStateOfChargeBatteryTest {
         /*
          * get a vehicle-builder and build a vehicle located at (10,10) with type "BEV"
          */
+
         VehicleImpl.Builder vehicleBuilder = VehicleImpl.Builder.newInstance("v");
         vehicleBuilder.setStartLocation(Location.newInstance(0, 0));
         vehicleBuilder.setType(vehicleType);
@@ -119,7 +117,7 @@ public class VehicleDependentStateOfChargeBatteryTest {
     }
 
     @Test
-    public void energyConsumptionOfShipmentInRouteInternal() {
+    public void stateOfChargeShouldDecreaseInRouteInternalState() {
         BatteryAM stateOfChargeBeforePickup = stateManager.getActivityState(route.getActivities().get(2), vehicle, InternalStates.STATE_OF_CHARGE, BatteryAM.class);
         BatteryAM stateOfChargeBeforeDelivery = stateManager.getActivityState(route.getActivities().get(4), vehicle, InternalStates.STATE_OF_CHARGE, BatteryAM.class);
         Assert.assertTrue(stateOfChargeBeforeDelivery.getSoC(0) > stateOfChargeBeforePickup.getSoC(0));

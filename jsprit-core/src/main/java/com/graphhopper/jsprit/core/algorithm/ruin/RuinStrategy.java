@@ -39,6 +39,7 @@ public interface RuinStrategy {
      */
     public Collection<Job> ruin(Collection<VehicleRoute> vehicleRoutes);
 
+
     /**
      * Adds a ruin-listener.
      *

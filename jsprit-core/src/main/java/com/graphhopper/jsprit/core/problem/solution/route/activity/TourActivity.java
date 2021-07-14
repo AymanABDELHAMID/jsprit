@@ -18,6 +18,7 @@
 package com.graphhopper.jsprit.core.problem.solution.route.activity;
 
 import com.graphhopper.jsprit.core.problem.Capacity;
+import com.graphhopper.jsprit.core.problem.ChargingStation;
 import com.graphhopper.jsprit.core.problem.HasIndex;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.job.Job;
@@ -51,6 +52,10 @@ public interface TourActivity extends HasIndex {
          */
         Job getJob();
 
+    }
+
+    interface RechargeActivity extends TourActivity {
+        ChargingStation getChargingStation();
     }
 
     /**

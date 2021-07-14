@@ -18,6 +18,7 @@
 package com.graphhopper.jsprit.core.algorithm.recreate;
 
 import com.graphhopper.jsprit.core.algorithm.recreate.listener.InsertionListener;
+import com.graphhopper.jsprit.core.problem.ChargingStation;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 
@@ -39,6 +40,27 @@ public interface InsertionStrategy {
      * @param unassignedJobs jobs to be inserted
      */
     public Collection<Job> insertJobs(Collection<VehicleRoute> vehicleRoutes, Collection<Job> unassignedJobs);
+
+    /* First solution proposed by Tarek
+    If this approach is followed, insertion points for the charging stations can be computed separately or in combination with Jobs
+    If separately, i'd advice to do it after the insertion of jobs
+    There can also be two parts of charging station insertion,
+    - one during the insertion of new jobs to make sure that such insertion do not violate the constraints regarding batteries
+    - another phase at the end where we check if a charging station is still needed independently of the job inserted
+    */
+    /*
+    default Collection<Job> insertJobs(Collection<VehicleRoute> vehicleRoutes, Collection<Job> unassignedJobs, Collection<ChargingStation> chargingStations) {
+        return this.insertJobs(vehicleRoutes, unassignedJobs);
+    }*/
+
+    //Second solution proposed by Tarek
+    /*
+    default void insertChargingStations(Collection<VehicleRoute> vehicleRoutes, Collection<ChargingStation> chargingStations) {
+
+    }*/
+
+
+
 
     public void addListener(InsertionListener insertionListener);
 

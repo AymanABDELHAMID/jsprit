@@ -17,6 +17,8 @@
  */
 package com.graphhopper.jsprit.core.problem.solution;
 
+import com.graphhopper.jsprit.core.problem.ChargingStation;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.util.VehicleRoutingEnergyCostMatrix;
@@ -144,6 +146,14 @@ public class VehicleRoutingProblemSolution {
 
     private solutionCosts solutionCosts = new solutionCosts(this);
 
+    /**
+     * This attribute contains the charging stations that are available
+     * By default it should be all the charging stations that were declared in the problem
+     * This will allow to have the charging stations available when generated next solutions from the current one
+     * There are cases when next solutions are generated just from previous ones without the VehicleRoutingProblem being available
+     */
+    private Collection<ChargingStation> usableChargingStations;
+
     private VehicleRoutingProblemSolution(VehicleRoutingProblemSolution solution) {
         routes = new ArrayList<VehicleRoute>();
         for (VehicleRoute r : solution.getRoutes()) {
@@ -181,6 +191,12 @@ public class VehicleRoutingProblemSolution {
         this.routes = routes;
         this.unassignedJobs = unassignedJobs;
         this.cost = cost;
+        this.usableChargingStations = new ArrayList<>();
+    }
+
+    public VehicleRoutingProblemSolution(Collection<VehicleRoute> routes, Collection<Job> jobs, Collection<ChargingStation> usableChargingStations, double cost){
+        this(routes, jobs, cost);
+        this.usableChargingStations = new ArrayList<>(usableChargingStations);
     }
 
     /**
@@ -225,6 +241,13 @@ public class VehicleRoutingProblemSolution {
      */
     public Collection<Job> getUnassignedJobs() {
         return unassignedJobs;
+    }
+
+    /**
+     * @return The collection of usable charging stations. Be careful the collection is directly returned and any alteration on it will affect the inner collection
+     */
+    public Collection<ChargingStation> getUsableChargingStations() {
+        return this.usableChargingStations;
     }
 
     @Override

@@ -96,9 +96,13 @@ public class RuinAndRecreateModule implements SearchStrategyModule {
             }
         }
         Collection<Job> unassignedJobs = insertion.insertJobs(previousVrpSolution.getRoutes(), ruinedJobSet);
+        // First solution proposed by Tarek
+        //Collection<Job> unassignedJobs = insertion.insertJobs(previousVrpSolution.getRoutes(), ruinedJobSet, previousVrpSolution.getUsableChargingStations());
         previousVrpSolution.getUnassignedJobs().clear();
         previousVrpSolution.getUnassignedJobs().addAll(unassignedJobs);
         previousVrpSolution.getUnassignedJobs().addAll(stillUnassignedInThisIteration);
+        // Second solution proposed by Tarek
+        // insertion.insertChargingStations(previousVrpSolution.getRoutes(), previousVrpSolution.getUsableChargingStations());
         return previousVrpSolution;
 
     }

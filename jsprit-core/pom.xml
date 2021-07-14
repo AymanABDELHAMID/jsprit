@@ -51,6 +51,11 @@
             <artifactId>slf4j-api</artifactId>
             <version>${logger.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.7</version>
+        </dependency>
 
     </dependencies>
 

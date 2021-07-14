@@ -151,6 +151,8 @@ public class VehicleRoutingProblem {
 
         private Set<Location> allLocations = new HashSet<>();
 
+        private Collection<ChargingStation> chargingStations = new ArrayList<>();
+
         /**
          * Returns the unmodifiable map of collected locations (mapped by their location-id).
          *
@@ -608,6 +610,12 @@ public class VehicleRoutingProblem {
     private final Collection<Location> allLocations;
 
     /**
+     * A collection of charging stations that can be used by the electric vehicles
+     */
+
+    private final Collection<ChargingStation> chargingStations;
+
+    /**
      * An enum that indicates type of fleetSize. By default, it is INFINTE
      */
     private final FleetSize fleetSize;
@@ -634,6 +642,7 @@ public class VehicleRoutingProblem {
         this.allLocations = builder.allLocations;
         this.allJobs = new HashMap<>(jobs);
         this.allJobs.putAll(builder.jobsInInitialRoutes);
+        this.chargingStations = builder.chargingStations;
         logger.info("setup problem: {}", this);
     }
 
@@ -778,6 +787,10 @@ public class VehicleRoutingProblem {
             for (AbstractActivity act : activityMap.get(job)) acts.add((AbstractActivity) act.duplicate());
         }
         return acts;
+    }
+
+    public Collection<ChargingStation> getChargingStations(){
+        return new ArrayList<>(this.chargingStations);
     }
 
 }

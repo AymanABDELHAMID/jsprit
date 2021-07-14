@@ -55,7 +55,7 @@ public class BatteryAM {
         }
         return BatteryAMBuilder.build();
     }
-    
+
 
     /**
      * Makes a deep copy of Capacity.
@@ -141,14 +141,19 @@ public static class Builder {
      */
     private BatteryAM(BatteryAM batteryAM) {
         this.dimensions = new double[batteryAM.getNuOfDimensions()];
+        this.maxRange = new double[batteryAM.getNuOfDimensions()];
         for (int i = 0; i < batteryAM.getNuOfDimensions(); i++) {
             this.dimensions[i] = batteryAM.get(i);
-            this.maxRange[i] = batteryAM.get(i);
+            this.maxRange[i] = this.dimensions[i];
         }
     }
 
     private BatteryAM(BatteryAM.Builder builder) {
-        dimensions = builder.dimensions;
+        this.dimensions = builder.dimensions;
+        this.maxRange = new double[this.dimensions.length];
+        for (int i = 0; i < this.maxRange.length; i++) {
+            this.maxRange[i] = this.dimensions[i];
+        }
     }
 
 
